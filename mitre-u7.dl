@@ -1,0 +1,101 @@
+
+% product(Manufacturer, Model, Type)
+% pc(Model, Clockrate, Ram, Hdsize, Price)
+% laptop(Model, Clockrate, Ram, Hdsize, Resolution, Price)
+% printer(Model, Color, Ptype, Price)
+% donkey
+
+product(acer, aspire8940g, laptop).
+product(lenovo, aspire8940g, laptop).
+product(dell, 2190, pc).
+product(ibm, 3289, pc).
+product(ibm, 3288, pc).
+product(minolta, pagepro6, printer).
+product(samsung, clp500, printer).
+product(hp, deskjet, printer).
+
+pc(2190, 1300, 2, 80, 392).
+pc(3289, 1100, 4, 160, 1281).
+pc(3288, 1050, 2, 160, 682).
+
+laptop(thinkpad, 800, 2, 1000, 120, 400).
+laptop(aspire8940g, 400, 1, 500, 140, 500).
+
+printer(pagepro6, false, laser, 329).
+printer(clp500, true, laser, 400).
+printer(deskjet, true, ink, 100).
+
+a(X) :- pc(X,Y,Z,V,W), larger(Y, 1200).
+b(X) :- laptop(X,Y,1,U,V,W), larger(V , 50).
+c(N,R) :- pc(N,O,P,Q,R), product(ibm,N,pc).
+c(N,R) :- laptop(N,S,T,U,V,R), product(ibm, N, laptop).
+c(N,R) :- printer(N,B,C,R), product(ibm,N,printer).
+d(X) :- printer(X, true, laser, Y).
+%e(D) :- group_by(pc(A,B,C,D,E),[D],(F = count,F >= 2)).
+f(H,Y,N,R) :- pc(N,O,P,Q,R), product(Y,N,pc), H = pc.
+f(H,Y,N,R) :- laptop(N,S,T,U,V,R), product(Y,N,laptop), H=laptop .
+f(H,Y,N,R) :- printer(N,B,C,R), product(Y,N,printer), H=printer.
+
+% 7.2
+
+% frequents(D,P)
+% serves(P,B)
+% likes(D,B)
+
+frequents(janus, godthaab).
+frequents(janus, goldenekrone).
+frequents(yanai, goldenekrone).
+frequents(dimi,  schlosskeller).
+
+serves(godthaab, tuborg).
+serves(godthaab, carlsberg).
+serves(goldenekrone, pfungstaedter).
+serves(schlosskeller, fix).
+
+likes(janus, tuborg).
+likes(janus, carlsberg).
+likes(janus, pfungstaedter).
+likes(dimi, pfungstaedter).
+
+happy(D) :- frequents(D,P), serves(P,B), likes(D,B).
+should_visit(D,P) :- serves(P,B), likes(D,B).
+% very_happy(D) :- 
+
+likes_pub(D, P) :-
+  likes(D, B),
+  serves(P, B).
+
+unhappy(D) :-
+  frequents(D, P),
+  \+ likes_pub(D, P).
+
+very_happy(D) :-
+  likes(D, _),
+  \+ unhappy(D).
+
+tmp(D) :- frequents(D, _).
+tmp(D) :- likes(D, _).
+sad(D) :- tmp(D), \+ happy(D).
+
+% 7.3
+
+% TODO
+
+% 7.4
+edge(a,b).
+edge(b,c).
+edge(b,f).
+edge(d,a).
+edge(d,e).
+edge(e,f).
+edge(e,g).
+edge(f,g).
+
+reachable(X,Y) :- reachable(X,Z), reachable(Z,Y).
+reachable(X,Y) :- edge(X,Y).
+
+reachable_pairs_from(I,P1,P2) :- reachable(I,P1), reachable(I,P2).
+reachable_pairs(P1,P2) :- reachable_pairs_from(I,P1,P2).
+
+odd(X,Y) :- edge(X,Y).
+odd(X,Y) :- odd(X,W), odd(W,Z), odd(Z,Y).

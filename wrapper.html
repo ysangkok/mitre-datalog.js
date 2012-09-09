@@ -1,8 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+<link type="text/css" rel="stylesheet" href="CodeMirror-2.33/lib/codemirror.css">
+<script type="text/javascript" src="CodeMirror-2.33/lib/codemirror.js"></script>
+<script type="text/javascript" src="CodeMirror-2.33/mode/clike/clike.js"></script>
+<link rel="stylesheet" href="CodeMirror-2.33/theme/neat.css">
     <meta charset="utf-8">
-    <title>title</title>
+    <title>MITRE Datalog</title>
     <script>
 	function addText(elId,text) {
 	    var obj = document.getElementById(elId);
@@ -15,7 +19,7 @@
 	var htmlEscape = function (v) {return v.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');};
 	var fileContent;
 	var Module = {};
-	Module["noExitRuntime"] = true;
+	//Module["noExitRuntime"] = true;
 	Module["noInitialRun"] = true;
 	Module["print"] = function(v) { addText("output",v+"\n"); };
 	Module["arguments"] = ['/test.dl'];
@@ -44,14 +48,25 @@
 'revpath':"% path test from Chen & Warren\nedge(a, b). edge(b, c). edge(c, d). edge(d, a).\npath(X, Y) :- edge(X, Y).\npath(X, Y) :- path(X, Z), edge(Z, Y).\npath(X, Y)?\n",
 'says':"tpme(tpme1).\nms(m1,'TPME',tpme1,ek,tp).\nsays(TPME,M) :- tpme(TPME),ms(M,'TPME',TPME,A,B).\nsays(A,B)?\n",
 'tc':"% Transitive closure test from Guo & Gupta\n\nr(X, Y) :- r(X, Z), r(Z, Y).\nr(X, Y) :- p(X, Y), q(Y).\np(a, b).  p(b, d).  p(b, c).\nq(b).  q(c).\nr(a, Y)?\n",
-'true':"true.\ntrue?\n"
+'true':"true.\ntrue?\n",
+'u7':"\n% product(Manufacturer, Model, Type)\n% pc(Model, Clockrate, Ram, Hdsize, Price)\n% laptop(Model, Clockrate, Ram, Hdsize, Resolution, Price)\n% printer(Model, Color, Ptype, Price)\n% donkey\n\nproduct(acer, aspire8940g, laptop).\nproduct(lenovo, aspire8940g, laptop).\nproduct(dell, 2190, pc).\nproduct(ibm, 3289, pc).\nproduct(ibm, 3288, pc).\nproduct(minolta, pagepro6, printer).\nproduct(samsung, clp500, printer).\nproduct(hp, deskjet, printer).\n\npc(2190, 1300, 2, 80, 392).\npc(3289, 1100, 4, 160, 1281).\npc(3288, 1050, 2, 160, 682).\n\nlaptop(thinkpad, 800, 2, 1000, 120, 400).\nlaptop(aspire8940g, 400, 1, 500, 140, 500).\n\nprinter(pagepro6, false, laser, 329).\nprinter(clp500, true, laser, 400).\nprinter(deskjet, true, ink, 100).\n\na(X) :- pc(X,Y,Z,V,W), larger(Y, 1200).\nb(X) :- laptop(X,Y,1,U,V,W), larger(V , 50).\nc(N,R) :- pc(N,O,P,Q,R), product(ibm,N,pc).\nc(N,R) :- laptop(N,S,T,U,V,R), product(ibm, N, laptop).\nc(N,R) :- printer(N,B,C,R), product(ibm,N,printer).\nd(X) :- printer(X, true, laser, Y).\n%e(D) :- group_by(pc(A,B,C,D,E),[D],(F = count,F >= 2)).\nf(H,Y,N,R) :- pc(N,O,P,Q,R), product(Y,N,pc), H = pc.\nf(H,Y,N,R) :- laptop(N,S,T,U,V,R), product(Y,N,laptop), H=laptop .\nf(H,Y,N,R) :- printer(N,B,C,R), product(Y,N,printer), H=printer.\n\n% 7.2\n\n% frequents(D,P)\n% serves(P,B)\n% likes(D,B)\n\nfrequents(janus, godthaab).\nfrequents(janus, goldenekrone).\nfrequents(yanai, goldenekrone).\nfrequents(dimi,  schlosskeller).\n\nserves(godthaab, tuborg).\nserves(godthaab, carlsberg).\nserves(goldenekrone, pfungstaedter).\nserves(schlosskeller, fix).\n\nlikes(janus, tuborg).\nlikes(janus, carlsberg).\nlikes(janus, pfungstaedter).\nlikes(dimi, pfungstaedter).\n\nhappy(D) :- frequents(D,P), serves(P,B), likes(D,B).\nshould_visit(D,P) :- serves(P,B), likes(D,B).\n% very_happy(D) :- \n\nlikes_pub(D, P) :-\n  likes(D, B),\n  serves(P, B).\n\nunhappy(D) :-\n  frequents(D, P),\n  \\+ likes_pub(D, P).\n\nvery_happy(D) :-\n  likes(D, _),\n  \\+ unhappy(D).\n\ntmp(D) :- frequents(D, _).\ntmp(D) :- likes(D, _).\nsad(D) :- tmp(D), \\+ happy(D).\n\n% 7.3\n\n% TODO\n\n% 7.4\nedge(a,b).\nedge(b,c).\nedge(b,f).\nedge(d,a).\nedge(d,e).\nedge(e,f).\nedge(e,g).\nedge(f,g).\n\nreachable(X,Y) :- reachable(X,Z), reachable(Z,Y).\nreachable(X,Y) :- edge(X,Y).\n\nreachable_pairs_from(I,P1,P2) :- reachable(I,P1), reachable(I,P2).\nreachable_pairs(P1,P2) :- reachable_pairs_from(I,P1,P2).\n\nodd(X,Y) :- edge(X,Y).\nodd(X,Y) :- odd(X,W), odd(W,Z), odd(Z,Y).\n"
 	};
 //for i in *.dl; do python -c "import json; print(\"'$(echo $i| cut -d. -f1)':\" + json.dumps(open('$i').read()));" >> out; done
-	var onLoad = function() { switc("ancestor"); };
+
+var editor;
+	var onLoad = function() {
+ editor = CodeMirror.fromTextArea(document.getElementById("datalog"), {
+    mode: "clike",
+    lineNumbers: true
+ });
+
+ switc("ancestor");
+
+ };
 	var submit = function() {
 		if (document.getElementById("submitbutton").disabled) throw new Error("disabled!");
 		document.getElementById("submitbutton").disabled = true;
-		fileContent = document.getElementById("datalog").value;
+		fileContent = editor.getValue();
 		var Module = CompiledModule();
 		document.getElementById("output").innerHTML="";
 		var rc = Module["run"]();
@@ -59,7 +74,7 @@
 		document.getElementById("submitbutton").disabled = false;
 	};
 	function switc(v) {
-		document.getElementById("datalog").value = data[v]; 
+		editor.setValue(data[v]); 
 		submit();
 	}
     </script>
