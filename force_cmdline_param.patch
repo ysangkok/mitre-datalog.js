@@ -1,0 +1,18 @@
+398,403c398
+<   switch (argc - optind) {
+<   case 0:			/* Use stdin */
+<     interact = 1;
+<     break;
+<   case 1:
+<     input = argv[optind];
+---
+>     input = argv[1];
+411,418d405
+<     else
+<       in = stdin;
+<     break;
+<   default:
+<     fprintf(stderr, "Bad arg count\n");
+<     usage(argv[0]);
+<     return 1;
+<   }

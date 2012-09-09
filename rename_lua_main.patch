@@ -1,0 +1,4 @@
+377c377
+< int main (int argc, char **argv) {
+---
+> int luamain2 (int argc, char **argv) {

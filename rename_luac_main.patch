@@ -1,0 +1,4 @@
+186c186
+< int main(int argc, char* argv[])
+---
+> int luamain(int argc, char* argv[])
