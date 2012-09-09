@@ -13,4 +13,7 @@ Instructions
 1. ``make``
 1. ``ln datalog datalog.bc``
 1. ``emcc -O2 --pre-js prejs.js -o datalog.js datalog.bc``
+1. ``cat datalog.js | sed -re '1s/^/var CompiledModule = function() {/' > tmp.js
+1. ``echo -ne "\nreturn Module;\n};" >> tmp.js``
+1. ``mv tmp.js datalog.js``
 1. ``js datalog.js``
