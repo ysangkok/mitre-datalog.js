@@ -1,0 +1,8 @@
+1c1
+< #! /bin/sh
+---
+> #!/bin/sh -ex
+6c6
+<   ./datalog $i | sort > $b.out
+---
+>   js ./datalog.js -l add.lua $i | sort > $b.out

@@ -1,18 +1,55 @@
-398,403c398
+369,404c369,370
+<   for (;;) {
+<     int c = getopt(argc, argv, "o:il:tvh");
+<     if (c == -1)
+<       break;
+<     switch (c) {
+<     case 'o':
+<       output = optarg;
+<       break;
+<     case 'i':
+<       interact = 1;
+<       break;
+<     case 'l':
+<       lua = optarg;
+<       break;
+<     case 't':
+<       print_as_tsv = 1;
+<       break;
+<     case 'v':
+<       print_version(argv[0]);
+<       return 0;
+<     case 'h':
+<       usage(argv[0]);
+<       return 0;
+<     default:
+<       usage(argv[0]);
+<       return 1;
+<     }
+<   }
+< 
 <   switch (argc - optind) {
 <   case 0:			/* Use stdin */
 <     interact = 1;
 <     break;
 <   case 1:
 <     input = argv[optind];
+<     if (strcmp(STDIN_NAME, input)) {
 ---
->     input = argv[1];
-411,418d405
+>     lua = argv[2];
+>     input = argv[3];
+410,423d375
+<     }
 <     else
 <       in = stdin;
 <     break;
 <   default:
 <     fprintf(stderr, "Bad arg count\n");
 <     usage(argv[0]);
+<     return 1;
+<   }
+< 
+<   if (output && !freopen(output, "w", stdout)) {
+<     perror(output);
 <     return 1;
 <   }

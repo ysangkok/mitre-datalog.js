@@ -25,16 +25,34 @@ printer(pagepro6, false, laser, 329).
 printer(clp500, true, laser, 400).
 printer(deskjet, true, ink, 100).
 
+% Welche PC-Modelle haben eine Taktfreqenz von mindestens 1200 MHz?
 a(X) :- pc(X,Y,Z,V,W), larger(Y, 1200).
+a(X)?
+
+% Welche Hersteller fertigen Notebooks, die 1GB RAM und eine Bildschirmauflösung von mindestens 50 ppi haben?
 b(X) :- laptop(X,Y,1,U,V,W), larger(V , 50).
+b(X)?
+
+% Finden Sie die Modellbezeichnungen und Preise aller Produkte von IBM.
 c(N,R) :- pc(N,O,P,Q,R), product(ibm,N,pc).
 c(N,R) :- laptop(N,S,T,U,V,R), product(ibm, N, laptop).
 c(N,R) :- printer(N,B,C,R), product(ibm,N,printer).
+c(N,R)?
+
+% Finden Sie die Modellbezeichnungen aller Farblaserdrucker.
 d(X) :- printer(X, true, laser, Y).
-%e(D) :- group_by(pc(A,B,C,D,E),[D],(F = count,F >= 2)).
+d(X)?
+
+% Finden Sie die Festplattengrößen, die in mindestens zwei PCs vorkommen.
+% e(D) :- group_by(pc(A,B,C,D,E),[D],(F = count,F >= 2)).
+e(B) :- pc(A, _, _, B, _), pc(C, _, _, B, _), A\=C.
+e(B)?
+
+% Erstellen Sie eine Relation, die eine Preisliste für alle Produkte erstellt.
 f(H,Y,N,R) :- pc(N,O,P,Q,R), product(Y,N,pc), H = pc.
 f(H,Y,N,R) :- laptop(N,S,T,U,V,R), product(Y,N,laptop), H=laptop .
 f(H,Y,N,R) :- printer(N,B,C,R), product(Y,N,printer), H=printer.
+f(A,B,C,D)?
 
 % 7.2
 
@@ -57,10 +75,15 @@ likes(janus, carlsberg).
 likes(janus, pfungstaedter).
 likes(dimi, pfungstaedter).
 
+% happy(D) ist wahr, genau dann wenn Trinker D wenigstens eine Bar besucht, die ein Bier ausschenkt, das er mag.
 happy(D) :- frequents(D,P), serves(P,B), likes(D,B).
-should_visit(D,P) :- serves(P,B), likes(D,B).
-% very_happy(D) :- 
+happy(D)?
 
+% should_visit(D,P) ist wahr, genau dann wenn Bar P ein Bier ausschenkt, dass Trinker D mag.
+should_visit(D,P) :- serves(P,B), likes(D,B).
+should_visit(D,P)?
+
+% very_happy(D) ist wahr, genau dann wenn jede Bar, die Trinker D besucht, wenigstens ein Bier ausschenkt, das er mag.
 likes_pub(D, P) :-
   likes(D, B),
   serves(P, B).
@@ -72,10 +95,13 @@ unhappy(D) :-
 very_happy(D) :-
   likes(D, _),
   \+ unhappy(D).
+very_happy(D)?
 
+% sad(D) ist wahr genau dann wenn Trinker D keine Bar besucht, die ein Bier ausschenkt, dass er mag.
 tmp(D) :- frequents(D, _).
 tmp(D) :- likes(D, _).
 sad(D) :- tmp(D), \+ happy(D).
+sad(D)?
 
 % 7.3
 
@@ -96,6 +122,9 @@ reachable(X,Y) :- edge(X,Y).
 
 reachable_pairs_from(I,P1,P2) :- reachable(I,P1), reachable(I,P2).
 reachable_pairs(P1,P2) :- reachable_pairs_from(I,P1,P2).
+reachable_pairs(A,B)?
 
 odd(X,Y) :- edge(X,Y).
 odd(X,Y) :- odd(X,W), odd(W,Z), odd(Z,Y).
+
+odd(A,B)?
