@@ -1,55 +1,37 @@
-369,404c369,370
-<   for (;;) {
-<     int c = getopt(argc, argv, "o:il:tvh");
-<     if (c == -1)
-<       break;
-<     switch (c) {
-<     case 'o':
-<       output = optarg;
-<       break;
-<     case 'i':
-<       interact = 1;
-<       break;
-<     case 'l':
-<       lua = optarg;
-<       break;
-<     case 't':
-<       print_as_tsv = 1;
-<       break;
-<     case 'v':
-<       print_version(argv[0]);
-<       return 0;
-<     case 'h':
-<       usage(argv[0]);
-<       return 0;
-<     default:
-<       usage(argv[0]);
-<       return 1;
-<     }
-<   }
-< 
-<   switch (argc - optind) {
-<   case 0:			/* Use stdin */
-<     interact = 1;
-<     break;
-<   case 1:
-<     input = argv[optind];
-<     if (strcmp(STDIN_NAME, input)) {
+21a22,25
+> #undef HAVE_LIBREADLINE
+> #undef HAVE_READLINE_READLINE_H
+> #undef HAVE_READLINE_HISTORY_H
+> 
+38a43
+> FILE* query_file = 0;
+254c259
+<   buf = fgets(lb->buffer, LINE_SIZE, stdin);
 ---
->     lua = argv[2];
->     input = argv[3];
-410,423d375
-<     }
-<     else
-<       in = stdin;
-<     break;
-<   default:
-<     fprintf(stderr, "Bad arg count\n");
-<     usage(argv[0]);
-<     return 1;
-<   }
-< 
-<   if (output && !freopen(output, "w", stdout)) {
-<     perror(output);
-<     return 1;
-<   }
+>   buf = fgets(lb->buffer, LINE_SIZE, query_file);
+355a361,364
+>   if (argc != 6 && argc != 4) { fprintf(stderr, "Need 5 or 3 arguments."); return 1; }
+>   int interact = (argc==6 ? 1 : 0);
+>   int nointeractbias = 0;
+>   if (!interact) nointeractbias = -1;
+359d367
+<   int interact = 0;
+368a377
+> /*
+399c408
+<   case 0:			/* Use stdin */
+---
+>   case 0:			// Use stdin
+403a413,414
+> */
+>     input = argv[4+nointeractbias];
+412a424
+> /*
+423a436
+> */
+430a444,448
+>   lua = argv[3+nointeractbias];
+>   if (interact) {
+>     query_file = fopen(argv[5+nointeractbias],"r");
+>     if (!query_file) { fprintf(stderr, "Can't open query file (argument 5)\n"); return 1; }
+>   }
