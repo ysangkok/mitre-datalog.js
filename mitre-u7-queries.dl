@@ -1,0 +1,41 @@
+% Welche PC-Modelle haben eine Taktfreqenz von mindestens 1200 MHz?
+a(X)?
+
+% Welche Hersteller fertigen Notebooks, die 1GB RAM und eine 
+% Bildschirmauflösung von mindestens 50 ppi haben?
+b(X)?
+
+% Finden Sie die Modellbezeichnungen und
+% Preise aller Produkte von IBM.
+c(N,R)?
+
+% Finden Sie die Modellbezeichnungen aller Farblaserdrucker.
+d(X)?
+
+% Finden Sie die Festplattengrößen, die
+% in mindestens zwei PCs vorkommen.
+e(B)?
+
+% Erstellen Sie eine Relation, die eine Preisliste
+% für alle Produkte erstellt.
+f(A,B,C,D)?
+
+% happy(D) ist wahr, genau dann wenn Trinker D wenigstens
+% eine Bar besucht, die ein Bier ausschenkt, das er mag.
+happy(D)?
+
+% should_visit(D,P) ist wahr, genau dann wenn
+% Bar P ein Bier ausschenkt, dass Trinker D mag.
+should_visit(D,P)?
+
+% very_happy(D) ist wahr, genau dann wenn jede Bar, die 
+% Trinker D besucht, wenigstens ein Bier ausschenkt, das er mag.
+very_happy(D)?
+
+% sad(D) ist wahr genau dann wenn Trinker D
+% keine Bar besucht, die ein Bier ausschenkt, dass er mag.
+sad(D)?
+
+reachable_pairs(A,B)?
+
+odd(A,B)?

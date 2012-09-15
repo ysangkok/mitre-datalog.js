@@ -3,14 +3,21 @@
 <head>
   <meta charset="utf-8">
   <title>MITRE Datalog</title>
+  <link type="text/css" rel="stylesheet" href="normalize.css">
+  <script src="css_browser_selector_dev.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js"></script>
   <script src="prefixfree.min.js"></script>
   <script src="prefixfree.jquery.js"></script>
+
   <link type="text/css" rel="stylesheet" href="CodeMirror-2.33/lib/codemirror.css">
   <script type="text/javascript" src="CodeMirror-2.33/lib/codemirror.js"></script>
-  <script type="text/javascript" src="CodeMirror-2.33/mode/clike/clike.js"></script>
+  <script type="text/javascript" src="datalogCodeMirrorMode.js"></script>
   <script type="text/javascript" src="CodeMirror-2.33/mode/lua/lua.js"></script>
-  <link rel="stylesheet" href="CodeMirror-2.33/theme/neat.css">
+  <link rel="stylesheet" href="CodeMirror-2.33/theme/lesser-dark.css">
+  <script src="CodeMirror-2.33/lib/util/simple-hint.js"></script>
+  <link rel="stylesheet" href="CodeMirror-2.33/lib/util/simple-hint.css">
+  <script src="datalog-hint.js"></script>
+
   <script src="wrapper.js"></script>
   <script src="datalog.js"></script>
   <style>
@@ -27,12 +34,13 @@
     .footer.row { height: 2em; bottom: 0;  padding-bottom:0.5em;}
 
     #output, textarea { width: 33%; height: calc(100% - 3em); }
-    #output { width: 100%; overflow: auto; font-family:monospace; }
-    button { width: 4em; height: 2em; }
+    #output { width: 100%; overflow: auto; white-space: pre; word-wrap: normal; }
     li { display: inline; }
-    .pane { padding-left: 1em; padding-right: 1em; height:100%; display:block; }
+    .pane { padding-top:1px; padding-left: 1em; padding-right: 1em; height: calc(100% - 1px); display:block; }
     input { font-size: 1.5em; }
     li > a { padding: 0.5em; }
+
+    .error { color: red; white-space: pre-wrap !important; }
 
     .taboneactive > #t2 { visibility:hidden; }
     #tabcontainer:not(.taboneactive) > #t1 { visibility:hidden; }
@@ -46,8 +54,10 @@
       border: 1px solid #e0e0e0;
       padding: 0.25em 0.5em;
     }
-    #tabs {
+    .webkit #tabs {
       padding-top: 2px; /* for north tab border */
+    }
+    #tabs {
       position: relative;
       top: 0;
       left: 0;
@@ -57,28 +67,22 @@
     .taboneactive > #tabs > #t2l a, :not(.taboneactive) > #tabs > #t1l a { background-color: #F0F0F0; }
   </style>
 </head>
-<body onload="javascript:onLoad();">
+<body>
   <div class="header row">
     <h2>MITRE Datalog</h2>
-    <script>
-      document.write("<ul>");
-      Object.keys(data).map(function(v) {
-        document.write("<li><a href='javascript:switc(\"" + v + "\");'>" + htmlEscape(v) + "</a></li>");
-      });
-      document.write("</ul>");
-    </script>
+    <ul id="examples">
+    </ul>
   </div> 
-  <form id="codeform" action="" method="get" onsubmit="return false;">
+  <form id="codeform" action="" method="get" onsubmit="javascript:return false;">
   <div class="body row scroll-y">
-    <div style="float:right; min-width:15%; max-width: 20%" class="pane">
+    <div style="float:right; min-width:15%; max-width: 35%" class="pane">
       <div class="fline">Output:</div>
-      <div id="output">
-      </div>
+      <pre id="output">
+      </pre>
     </div>
     <div style="float:left; min-width:30%;" class="pane" id="datalogpane">
       <div class="fline"><label for="datalog">Datalog code:</label></div>
-      <textarea id="datalog" style="width: 100%">
-      </textarea>
+      <textarea id="datalog" style="width: 100%"></textarea>
     </div>
     <div class="pane" id="luapane">
       <div style="min-width: 40%;" id="tabcontainer" class="taboneactive">
@@ -87,12 +91,10 @@
           <li class="tnl" id="t2l"><label for="queries"><a href="javascript:tab('#t2');">Datalog queries</a></label></li>
         </ul>
         <div id="t1">
-          <textarea id="lua">
-          </textarea>
+          <textarea id="lua"></textarea>
         </div>
         <div id="t2">
-          <textarea id="queries">
-          </textarea>
+          <textarea id="queries"></textarea>
         </div>
       </div>
     </div>

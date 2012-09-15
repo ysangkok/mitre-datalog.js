@@ -1,3 +1,53 @@
+local function unequal(literal)
+  return function(s, v)
+    if v then
+      return nil
+    else
+      local x = literal[1]
+      local y = literal[2]
+      if x:is_const() and y:is_const() then
+        if x.id == y.id then
+          return nil
+        else
+          return {x.id,y.id}
+        end
+      else
+        return nil
+      end
+    end
+  end
+end
+datalog.add_iter_prim("unequal", 2, unequal)
+
+local function larger(literal)
+  return function(s, v)
+    if v then
+      return nil
+    else
+      local x = literal[1]
+      local y = literal[2]
+      if x:is_const() and y:is_const() then
+        local j = tonumber(x.id)
+        local k = tonumber(y.id)
+        if j > k then
+          return {j, k}
+        else
+          return nil
+        end
+      elseif x:is_const() then
+        local k = tonumber(x.id)
+        return {k, k-1}
+      elseif y:is_const() then
+        local j = tonumber(y.id)
+        return {j+1, j}
+      else
+        return nil
+      end
+    end
+  end
+end
+datalog.add_iter_prim("larger", 2, larger)
+
 local function add(literal)
    return function(s, v)
      if v then
@@ -36,5 +86,4 @@ local function add(literal)
      end
   end
 end
-
 datalog.add_iter_prim("add", 3, add)
