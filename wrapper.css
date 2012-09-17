@@ -1,0 +1,207 @@
+    #tableoutput {
+      font-size: 0.8em;
+    }
+    .tabs a:focus {
+      outline: none;
+    }
+
+    body.twocolumnlayout #outputpane { width: 100%; }
+    .tabs, .footer.row, .header.row {
+      font-family: 'Georgia', serif;
+    }
+
+    body.light {
+      background-color: #fff;
+      color: #111;
+    }
+    body.dark {
+      background-color: #222;
+      color: #aaa;
+    }
+    body.light .CodeMirror, body.light .outputtab {border: 1px solid #e0e0e0;}
+    body.dark  .CodeMirror, body.dark  .outputtab {border: 1px solid #181818;}
+    body.light .header.row { color: #aaa; }
+    body.light #examples a { color: #55f; }
+    body.dark .header.row { color: #777; }
+    body.dark #examples a { color: #229; }
+
+    body.dark select, body.dark input { background-color: #333; color: inherit; }
+
+    #selectdiv { float: right; }
+
+    .header.row ul { display: inline; }
+    .header.row h2 a { color: inherit; }
+    * { padding: 0; margin: 0; }
+    .row, .col { overflow: hidden; position: absolute; }
+    .row { left: 0; right: 0; }
+    .col { top: 0; bottom: 0; }
+    .scroll-x { overflow-x: auto; }
+    .scroll-y { overflow-y: auto; }
+
+    .header.row { height: 4em; top: 0; padding-top: 0.5em; padding-left: 1em; padding-right: 1em; overflow:auto; }
+    .body.row { top: 4.5em; bottom: 3em; }
+    .footer.row { height: 2.5em; bottom: 0;  padding-bottom:0.5em; }
+
+    .CodeMirror, #output { font-size: 1em; }
+    body#lesser-dark .CodeMirror, body#lesser-dark .outputtab pre { font-size: 0.8em; }
+
+    .outputtab, .pane textarea { width: 33%; height: calc(100% - 3em); }
+    #output {  white-space: pre; word-wrap: normal; }
+    .outputtab { overflow: auto; padding-bottom: 0.5em; }
+    .outputtab { width: 100%; } 
+    .outputtab > * { padding: 0.5em; }
+    .tabs li, #examples li { display: inline; }
+    .pane { padding-top:1px; padding-left: 1em; padding-right: 1em; height: calc(100% - 1px); display:block; }
+    #submitbutton { font-size: 1.5em; }
+    #examples li > a { padding: 0.5em; }
+
+    .error { color: red; white-space: pre-wrap !important; }
+
+    .outputtab td, .outputtab th { padding-right: 0.5em; }
+    .outputtab th { white-space: nowrap; }
+    .outputtab h3 { margin-top: 1em; }
+    .outputtab h3, .outputtab table { margin-bottom: 1.0em; }
+
+    .taboneactive > .t2 { visibility:hidden; }
+    .tabcontainer:not(.taboneactive) > .t1 { visibility:hidden; }
+    .tabcontainer { display:inline-block; position:relative; }
+    .t1, .t2 { position: absolute; top:1.8em; left:0; width: 100%; height: calc(100% - 1.5em); }
+    .t2 > textarea { width: 100%; height: 100%; }
+    .tabs > li, .fline { line-height: 1.8em; }
+    .tnl a, .tnl a:hover, .tnl a:active .tnl a:visited {
+      color: inherit;
+      text-decoration:none;
+      padding: 0.25em 0.5em;
+    }
+    .webkit .tabs {
+      padding-top: 2px;
+    }
+    .gecko .tabs {
+      padding-top: 1px;
+    }
+    .tabs {
+      position: relative;
+      top: 0;
+      left: 0;
+      z-index: 10;
+    }
+    #tabcontainer .tabs {
+      padding-left: 4em;
+    }
+    #outputtabcontainer { width: 100%; }
+    body.light .tnl a { border: 1px solid #e0e0e0; }
+    body.light .taboneactive > .tabs > .t1l a, body.light :not(.taboneactive) > .tabs > .t2l a { border-bottom: 1px solid rgba(255,255,255,1.0); }
+    body.light .taboneactive > .tabs > .t2l a, body.light :not(.taboneactive) > .tabs > .t1l a { background-color: #F0F0F0; color: #999; }
+    body.light :not(.taboneactive) > .tabs > .t2l a, body.light .taboneactive > .tabs > .t1l a { background-color: #fff; }
+
+    body.dark .tnl a { border: 1px solid #181818; }
+    body.dark .taboneactive > .tabs > .t1l a, body.dark :not(.taboneactive) > .tabs > .t2l a { border-bottom: 1px solid rgba(255,255,255,0); }
+    body.dark .taboneactive > .tabs > .t2l a, body.dark :not(.taboneactive) > .tabs > .t1l a { background-color: inherit; color: #444; }
+
+    body.dark :not(.taboneactive) > .tabs > .t2l a, body.dark .taboneactive > .tabs > .t1l a { background-color: red; }
+
+    body#ambience .outputtab, body#ambiance :not(.taboneactive) > .tabs > .t2l a, body#ambiance .taboneactive > .tabs > .t1l a { background-color: #151515; }
+    body#blackboard .outputtab, body#blackboard :not(.taboneactive) > .tabs > .t2l a, body#blackboard .taboneactive > .tabs > .t1l a { background-color: #0C1021; }
+    body#cobalt .outputtab, body#cobalt :not(.taboneactive) > .tabs > .t2l a, body#cobalt .taboneactive > .tabs > .t1l a { background-color: #002240; }
+    body#erlang-dark .outputtab, body#erlang-dark :not(.taboneactive) > .tabs > .t2l a, body#erlang-dark .taboneactive > .tabs > .t1l a { background-color: #002240; }
+    body#lesser-dark .outputtab, body#lesser-dark :not(.taboneactive) > .tabs > .t2l a, body#lesser-dark .taboneactive > .tabs > .t1l a { background-color: #262626; }
+    body#monokai .outputtab, body#monokai :not(.taboneactive) > .tabs > .t2l a, body#monokai .taboneactive > .tabs > .t1l a { background-color: #272822; }
+    body#night .outputtab, body#night :not(.taboneactive) > .tabs > .t2l a, body#night .taboneactive > .tabs > .t1l a { background-color: #0A001F; }
+    body#rubyblue .outputtab, body#rubyblue :not(.taboneactive) > .tabs > .t2l a, body#rubyblue .taboneactive > .tabs > .t1l a { background-color: #112435; }
+    body#vibrant-ink .outputtab, body#vibrant-ink :not(.taboneactive) > .tabs > .t2l a, body#vibrant-ink .taboneactive > .tabs > .t1l a { background-color: #000; }
+    body#xq-dark .outputtab, body#xq-dark :not(.taboneactive) > .tabs > .t2l a, body#xq-dark .taboneactive > .tabs > .t1l a { background-color: #0A001F; }
+
+
+body.dark ::-webkit-scrollbar{
+    width:0.8em;
+    height:0.8em;
+    background-color:#222;
+}
+body.dark ::-webkit-scrollbar:hover{
+    background-color:#222;
+}
+body.dark ::-webkit-resizer{
+    -webkit-border-radius:4px;
+    background-color:#eee;
+}
+body.dark ::-webkit-scrollbar-thumb{
+    min-height:0.8em;
+    min-width:0.8em;
+    -webkit-border-radius:4px;
+    background-color: #303030;
+}
+body.dark ::-webkit-scrollbar-thumb:hover{
+    background-color: #383838;
+}
+body.dark ::-webkit-scrollbar-thumb:active{
+    background-color:#383838;
+}
+
+.button {
+  display: inline-block;
+  vertical-align: middle;
+  margin: 0 2px;
+  outline: none;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  padding: .1em .5em .55em;
+  text-shadow: 0 1px 1px rgba(0,0,0,.3);
+  -webkit-border-radius: .5em; 
+  -moz-border-radius: .5em;
+  border-radius: .5em;
+  -webkit-box-shadow: 0 1px 2px rgba(0,0,0,.2);
+  -moz-box-shadow: 0 1px 2px rgba(0,0,0,.2);
+  box-shadow: 0 1px 2px rgba(0,0,0,.2);
+}
+body.dark .button { opacity: 0.75; }
+.button:hover {
+  text-decoration: none;
+}
+.button:active {
+  position: relative;
+  top: 1px;
+}
+
+body.dark .button {
+  color: #d9eef7;
+  border: solid 1px #0076a3;
+  background: #0095cd;
+  background: -webkit-gradient(linear, left top, left bottom, from(#00adee), to(#0078a5));
+  background: -moz-linear-gradient(top,  #00adee,  #0078a5);
+}
+body.dark .button:hover {
+  background: #007ead;
+  background: -webkit-gradient(linear, left top, left bottom, from(#0095cc), to(#00678e));
+  background: -moz-linear-gradient(top,  #0095cc,  #00678e);
+}
+body.dark .button:active {
+  color: #80bed6;
+  background: -webkit-gradient(linear, left top, left bottom, from(#0078a5), to(#00adee));
+  background: -moz-linear-gradient(top,  #0078a5,  #00adee);
+}
+
+body.light .button {
+  color: #606060;
+  border: solid 1px #b7b7b7;
+  background: #fff;
+  background: -webkit-gradient(linear, left top, left bottom, from(#fff), to(#ededed));
+  background: -moz-linear-gradient(top,  #fff,  #ededed);
+}
+body.light .button:hover {
+  background: #ededed;
+  background: -webkit-gradient(linear, left top, left bottom, from(#fff), to(#dcdcdc));
+  background: -moz-linear-gradient(top,  #fff,  #dcdcdc);
+}
+body.light .button:active {
+  color: #999;
+  background: -webkit-gradient(linear, left top, left bottom, from(#ededed), to(#fff));
+  background: -moz-linear-gradient(top,  #ededed,  #fff);
+}
+
+#outputpane { float: right; min-width: 25%; max-width: 55% }
+#datalogpane { float: left; min-width: 30%; }
+#datalog { width: 100%; }
+#tabcontainer { min-width: 40%; }
+#footerpane { display:inline-block;width:calc(100% - 2em);text-align:right; }
+#submitbutton { height: 100%; }

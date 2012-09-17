@@ -2,107 +2,150 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>MITRE Datalog</title>
+  <title>Datalog.js</title>
+<script type="text/js-worker" src="datalog.js"></script>
+<script type="text/js-worker">
+var queryableFunctions = {
+  runDatalog: function(clauses, lua, queries) {
+      var wrapperPreInit = function(FS) {
+          FS.createDataFile('/', 'datalog.dl', clauses, true, false);
+          FS.createDataFile('/', 'queries.dl', queries, true, false);
+          FS.createDataFile('/', 'lib.lua', lua, true, false);
+      };
+
+      var Module = {};
+      Module["arguments"] = ['-i', '-l', '/lib.lua', '/datalog.dl', '/queries.dl'];
+      Module["print"] = function(v) { reply("print", v); };
+      Module["noInitialRun"] = true;
+      Module = CompiledModule(Module,wrapperPreInit);
+      var rc = Module["run"]();
+      reply("runFinished", rc);
+  }
+};
+ 
+function defaultQuery (vMsg) {
+  // default PUBLIC function executed only when main page calls the queryableWorker.postMessage() method directly
+}
+ 
+function reply (/* listener name, argument to pass 1, argument to pass 2, etc. etc */) {
+  if (arguments.length < 1) { throw new TypeError("reply - not enough arguments"); return; }
+  postMessage({ "vo42t30": arguments[0], "rnb93qh": Array.prototype.slice.call(arguments, 1) });
+}
+ 
+self.onmessage = function (oEvent) {
+  if (oEvent.data instanceof Object && oEvent.data.hasOwnProperty("bk4e1h0") && oEvent.data.hasOwnProperty("ktp3fm1")) {
+    queryableFunctions[oEvent.data.bk4e1h0].apply(self, oEvent.data.ktp3fm1);
+  } else {
+    defaultQuery(oEvent.data);
+  }
+};
+</script>
   <link type="text/css" rel="stylesheet" href="normalize.css">
   <script src="css_browser_selector_dev.js"></script>
+
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js"></script>
   <script src="prefixfree.min.js"></script>
   <script src="prefixfree.jquery.js"></script>
+  <script src="jquery.qtip.min.js"></script>
+  <link type="text/css" rel="stylesheet" href="jquery.qtip.css">
 
   <link type="text/css" rel="stylesheet" href="CodeMirror-2.33/lib/codemirror.css">
   <script type="text/javascript" src="CodeMirror-2.33/lib/codemirror.js"></script>
   <script type="text/javascript" src="datalogCodeMirrorMode.js"></script>
   <script type="text/javascript" src="CodeMirror-2.33/mode/lua/lua.js"></script>
+  <link rel="stylesheet" href="CodeMirror-2.33/theme/neat.css">
+  <link rel="stylesheet" href="CodeMirror-2.33/theme/elegant.css">
+  <link rel="stylesheet" href="CodeMirror-2.33/theme/erlang-dark.css">
+  <link rel="stylesheet" href="CodeMirror-2.33/theme/night.css">
+  <link rel="stylesheet" href="CodeMirror-2.33/theme/monokai.css">
+  <link rel="stylesheet" href="CodeMirror-2.33/theme/cobalt.css">
+  <link rel="stylesheet" href="CodeMirror-2.33/theme/eclipse.css">
+  <link rel="stylesheet" href="CodeMirror-2.33/theme/rubyblue.css">
   <link rel="stylesheet" href="CodeMirror-2.33/theme/lesser-dark.css">
+  <link rel="stylesheet" href="CodeMirror-2.33/theme/xq-dark.css">
+  <link rel="stylesheet" href="CodeMirror-2.33/theme/ambiance.css">
+  <link rel="stylesheet" href="CodeMirror-2.33/theme/blackboard.css">
+  <link rel="stylesheet" href="CodeMirror-2.33/theme/vibrant-ink.css">
   <script src="CodeMirror-2.33/lib/util/simple-hint.js"></script>
   <link rel="stylesheet" href="CodeMirror-2.33/lib/util/simple-hint.css">
   <script src="datalog-hint.js"></script>
+  <script src="amplify-1.1.0/src/store/amplify.store.js"></script>
+
 
   <script src="wrapper.js"></script>
-  <script src="datalog-2.2/datalog.js"></script>
-  <style>
-    .CodeMirror {border: 1px solid #e0e0e0;}
-    * { padding: 0; margin: 0; }
-    .row, .col { overflow: hidden; position: absolute; }
-    .row { left: 0; right: 0; }
-    .col { top: 0; bottom: 0; }
-    .scroll-x { overflow-x: auto; }
-    .scroll-y { overflow-y: auto; }
+  <link type="text/css" rel="stylesheet" href="wrapper.css">
 
-    .header.row { height: 4em; top: 0; padding-top: 0.5em; padding-left: 1em; overflow:auto; }
-    .body.row { top: 4.5em; bottom: 3em; }
-    .footer.row { height: 2em; bottom: 0;  padding-bottom:0.5em;}
-
-    #output, textarea { width: 33%; height: calc(100% - 3em); }
-    #output { width: 100%; overflow: auto; white-space: pre; word-wrap: normal; }
-    li { display: inline; }
-    .pane { padding-top:1px; padding-left: 1em; padding-right: 1em; height: calc(100% - 1px); display:block; }
-    input { font-size: 1.5em; }
-    li > a { padding: 0.5em; }
-
-    .error { color: red; white-space: pre-wrap !important; }
-
-    .taboneactive > #t2 { visibility:hidden; }
-    #tabcontainer:not(.taboneactive) > #t1 { visibility:hidden; }
-    #tabcontainer { display:inline-block; position:relative; }
-    #t1, #t2 { position: absolute; top:1.8em; left:0; width: 100%; height: calc(100% - 1.5em); }
-    #t2 > textarea { width: 100%; height: 100%; }
-    #tabs > li, .fline { line-height: 1.8em; }
-    .tnl a, .tnl a:hover, .tnl a:active .tnl a:visited {
-      color: inherit;
-      text-decoration:none;
-      border: 1px solid #e0e0e0;
-      padding: 0.25em 0.5em;
-    }
-    .webkit #tabs {
-      padding-top: 2px; /* for north tab border */
-    }
-    #tabs {
-      position: relative;
-      top: 0;
-      left: 0;
-      z-index: 10;
-    }
-    .taboneactive > #tabs > #t1l a, :not(.taboneactive) > #tabs > #t2l a { border-bottom: 1px solid rgba(255,255,255,255); }
-    .taboneactive > #tabs > #t2l a, :not(.taboneactive) > #tabs > #t1l a { background-color: #F0F0F0; }
-  </style>
 </head>
 <body>
   <div class="header row">
-    <h2>MITRE Datalog</h2>
+    <div id="selectdiv">
+    <label for="select">Theme:</label>
+    <select id="select">
+    <option>ambiance</option>
+    <option>blackboard</option>
+    <option>cobalt</option>
+    <option>eclipse</option>
+    <option>elegant</option>
+    <option>erlang-dark</option>
+    <option selected>lesser-dark</option>
+    <option>monokai</option>
+    <option>neat</option>
+    <option>night</option>
+    <option>rubyblue</option>
+    <option>vibrant-ink</option>
+    <option>xq-dark</option>
+    </select>
+    </div>
+    <h2>Datalog.js (using the <a href="http://datalog.sourceforge.net/">MITRE lightweight Datalog</a>)</h2>
+    Examples:
     <ul id="examples">
     </ul>
   </div> 
-  <form id="codeform" action="" method="get" onsubmit="javascript:return false;">
+  <form id="codeform" action="#" method="get" onsubmit="javascript:return false;">
   <div class="body row scroll-y">
-    <div style="float:right; min-width:15%; max-width: 35%" class="pane">
-      <div class="fline">Output:</div>
-      <pre id="output">
-      </pre>
+    <div class="pane" id="outputpane">
+<!--      <div class="fline">Output:</div>-->
+      <div class="tabcontainer taboneactive" id="outputtabcontainer">
+        <ul class="tabs">
+          <li class="tnl t1l"><a href="javascript:tab('t1','#outputtabcontainer');">output as Datalog</a></li>
+          <li class="tnl t2l"><a href="javascript:tab('t2','#outputtabcontainer');">output as tables</a></li>
+        </ul>
+        <div class="t1">
+          <div class="outputtab">
+            <pre id="output">
+            </pre>
+          </div>
+        </div>
+        <div class="t2">
+          <div class="outputtab">
+            <div id="tableoutput">
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-    <div style="float:left; min-width:30%;" class="pane" id="datalogpane">
-      <div class="fline"><label for="datalog">Datalog code:</label></div>
-      <textarea id="datalog" style="width: 100%"></textarea>
+    <div class="pane" id="datalogpane">
+      <div class="fline"><label for="datalog">Datalog program:</label></div>
+      <textarea id="datalog"></textarea>
     </div>
     <div class="pane" id="luapane">
-      <div style="min-width: 40%;" id="tabcontainer" class="taboneactive">
-        <ul id="tabs">
-          <li class="tnl" id="t1l"><label for="lua"><a href="javascript:tab('#t1');">Lua</a></label></li>
-          <li class="tnl" id="t2l"><label for="queries"><a href="javascript:tab('#t2');">Datalog queries</a></label></li>
+      <div class="tabcontainer taboneactive" id="tabcontainer">
+        <ul class="tabs">
+          <li class="tnl t1l"><label for="lua"><a href="javascript:tab('t1','#tabcontainer');">Lua</a></label></li>
+          <li class="tnl t2l"><label for="queries"><a href="javascript:tab('t2','#tabcontainer');">Datalog queries</a></label></li>
         </ul>
-        <div id="t1">
+        <div class="t1">
           <textarea id="lua"></textarea>
         </div>
-        <div id="t2">
+        <div class="t2">
           <textarea id="queries"></textarea>
         </div>
       </div>
     </div>
   </div> 
   <div class="footer row">
-    <div style="display:inline-block;width:calc(100% - 2em); " class="pane">
-      <input id="submitbutton" type="submit" style="height:100%;width:100%" disabled>
-      <!--<button onclick="javascript:submit();" id="submitbutton">Run</button>-->
+    <div id="footerpane" class="pane">
+      <input id="submitbutton" class="button" type="submit" disabled>
     </div>
   </div>
   </form>

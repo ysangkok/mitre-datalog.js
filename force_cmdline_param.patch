@@ -5,31 +5,68 @@
 > 
 38a43
 > FILE* query_file = 0;
-254c259
+117d121
+<   dl_free(a);
+131c135
+<     printf("\n");		/* Print zero arity predicate. */
+---
+>     printf("% TSV \n");		/* Print zero arity predicate. */
+133a138
+>       printf("% TSV ");
+144d148
+<   dl_free(a);
+155,158c159,162
+<   if (print_as_tsv)
+<     return print_answers_as_tab_separated_values(a);
+<   else
+<     return print_answers_as_datalog(a);
+---
+>     int rc = print_answers_as_tab_separated_values(a) |
+>            (print_answers_as_datalog(a) << 16);
+>     dl_free(a);
+>     return rc;
+252,254c256,258
+<   fputs(prompt, stdout);	/* Show prompt */
+<   fflush(stdout);		/* then get a line */
 <   buf = fgets(lb->buffer, LINE_SIZE, stdin);
 ---
+>   //fputs(prompt, stdout);	/* Show prompt */
+>   //fflush(stdout);		/* then get a line */
 >   buf = fgets(lb->buffer, LINE_SIZE, query_file);
-355a361,364
+268c272,275
+<   else if (!nofiles && buf[0] == '=') {	/* File loading requested. */
+---
+>   if (buf != 0) { printf("% QUERY %s", buf); // incl newline
+>     if (buf[strlen(buf)-1] != '\n') puts("");
+>   }
+>   if (!nofiles && buf[0] == '=') {	/* File loading requested. */
+320,321c327,328
+<   if (package != NULL)		/* Show welcome message. */
+<     printf("%s %s\n\n", package, version);
+---
+> //  if (package != NULL)		/* Show welcome message. */
+> //    printf("%s %s\n\n", package, version);
+355a363,366
 >   if (argc != 6 && argc != 4) { fprintf(stderr, "Need 5 or 3 arguments."); return 1; }
 >   int interact = (argc==6 ? 1 : 0);
 >   int nointeractbias = 0;
 >   if (!interact) nointeractbias = -1;
-359d367
+359d369
 <   int interact = 0;
-368a377
+368a379
 > /*
-399c408
+399c410
 <   case 0:			/* Use stdin */
 ---
 >   case 0:			// Use stdin
-403a413,414
+403a415,416
 > */
 >     input = argv[4+nointeractbias];
-412a424
+412a426
 > /*
-423a436
+423a438
 > */
-430a444,448
+430a446,450
 >   lua = argv[3+nointeractbias];
 >   if (interact) {
 >     query_file = fopen(argv[5+nointeractbias],"r");

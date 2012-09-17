@@ -1,10 +1,68 @@
 (function(){
 "use strict";
-var tab = function(id) {
-  if (id === "#t1")
-    $("#tabcontainer").addClass("taboneactive");
+  function QueryableWorker (sURL, fDefListener, fOnError) {
+    var oInstance = this, oWorker = new Worker(sURL), oListeners = {};
+    this.defaultListener = fDefListener || function () {};
+    oWorker.onmessage = function (oEvent) {
+      if (oEvent.data instanceof Object && oEvent.data.hasOwnProperty("vo42t30") && oEvent.data.hasOwnProperty("rnb93qh")) {
+        oListeners[oEvent.data.vo42t30].apply(oInstance, oEvent.data.rnb93qh);
+      } else {
+        this.defaultListener.call(oInstance, oEvent.data);
+      }
+    };
+    if (fOnError) { oWorker.onerror = fOnError; }
+    this.sendQuery = function () {
+      if (arguments.length < 1) { throw new TypeError("QueryableWorker.sendQuery - not enough arguments"); return; }
+      oWorker.postMessage({ "bk4e1h0": arguments[0], "ktp3fm1": Array.prototype.slice.call(arguments, 1) });
+    };
+    this.postMessage = function (vMsg) {
+      Worker.prototype.postMessage.call(oWorker, vMsg);
+    };
+    this.terminate = function () {
+      Worker.prototype.terminate.call(oWorker);
+    };
+    this.addListener = function (sName, fListener) {
+      oListeners[sName] = fListener;
+    };
+    this.removeListener = function (sName) {
+      delete oListeners[sName];
+    };
+  };
+ 
+  var getWorkerTask = (function(fin){var slist = [];
+  var runList = function (remaining,list) {
+    if (remaining.length == 0) { fin(new QueryableWorker((window.webkitURL ? webkitURL : URL).createObjectURL(new Blob(list)) )); return; } // , yourDefaultMessageListenerHere (optional), yourErrorListenerHere (optional)
+    var oScript = remaining[0];
+    if ($(oScript).attr("src") !== undefined) {
+      jQuery.ajax( {
+        url: $(oScript).attr("src"),
+        success: function(data){
+          list.push(data);
+          runList(remaining.slice(1),list);
+        },
+        dataType:"text"
+      });
+    } else {
+      list.push(oScript.textContent);
+      runList(remaining.slice(1),list);
+    }
+  };
+  runList(Array.prototype.slice.call(document.querySelectorAll("script[type=\"text\/js-worker\"]")),slist);
+  });
+
+
+
+
+
+
+
+
+
+var tab = function(id,container) {
+  if (id === "t1")
+    jQuery(container).addClass("taboneactive");
   else
-    $("#tabcontainer").removeClass("taboneactive");
+    jQuery(container).removeClass("taboneactive");
 };
 var jump = function(line,box) {
       box.setCursor(Number(line),0);
@@ -40,12 +98,6 @@ var htmlEscape = function(v) {
     return v.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 };
 var datalogContent, luaContent, queryContent;
-var wrapperPreInit = function(FS) {
-    //window.FS = FS;
-    FS.createDataFile('/', 'datalog.dl', datalogContent, true, false);
-    FS.createDataFile('/', 'queries.dl', queryContent, true, false);
-    FS.createDataFile('/', 'lib.lua', luaContent, true, false);
-}
 
 var assert = function(thing) { if (thing !== true) throw new Error("Assertion failed");};
 
@@ -87,6 +139,7 @@ data["u7"] = new example(get("mitre-u7-clauses.dl"),get("mitre-u7-queries.dl"));
 
 var editor, luaEditor, queryEditor;
 var switc = function(v) {
+    var oldPos = $($("#luapane").children()[0]).offset();
     try {
       editor.setValue(data[v].clauses);
     } catch (err) {
@@ -97,16 +150,58 @@ var switc = function(v) {
     } catch (err) {
       document.getElementById("queries").value = data[v].queries;
     }
-    if (data[v].queries !== "") tab("#t2");
-    execute();
+    if (data[v].queries !== "") tab("t2");
+    execute(oldPos);
 }
 
+var task;
+
 var onLoad = function() {
+    CodeMirror.commands.autocomplete = function(cm) {
+        CodeMirror.simpleHint(cm, CodeMirror.datalogHint);
+    }
+    var lineNum = true;
+    editor = CodeMirror.fromTextArea(document.getElementById("datalog"), {
+        mode: "datalog",
+        lineNumbers: lineNum,
+        extraKeys: {"Ctrl-Space": "autocomplete"}
+    });
+    queryEditor = CodeMirror.fromTextArea(document.getElementById("queries"), {
+        mode: "datalog",
+        lineNumbers: lineNum,
+        extraKeys: {"Ctrl-Space": "autocomplete"}
+    });
+    luaEditor = CodeMirror.fromTextArea(document.getElementById("lua"), {
+        mode: "lua",
+        lineNumbers: lineNum
+    });
+
+
+  getWorkerTask(function(mytask) {
+    task = mytask;
+    $(".body").scroll(function(){
+      $('.qtip').each(function(){
+        $(this).qtip('hide')
+      });
+    });
+
+    var input = document.getElementById("select");
+    var selectTheme = function() {
+      var theme = input.options[input.selectedIndex].innerHTML;
+      [editor,luaEditor,queryEditor].map(function(v){v.setOption("theme", theme);});
+      document.getElementsByTagName("body")[0].id=theme;
+      var dir = {};
+      ["ambiance", "blackboard", "cobalt", "erlang-dark", "lesser-dark", "monokai", "night", "rubyblue", "vibrant-ink", "xq-dark"].map(function(v){dir[v]="dark";}); 
+      ["eclipse", "elegant", "neat"].map(function(v){dir[v]="light";});
+      document.getElementsByTagName("body")[0].className=dir[theme];
+    };
+    input.onchange = input.onkeyup = selectTheme;
+
     Object.keys(data).map(function(v) {
       jQuery("#examples").append(jQuery("<li>").append(jQuery("<a href='javascript:void(0);'>").click(function() { switc(v); }).append(v)));
     });
 
-    jQuery("#codeform").submit(function(e) { execute(); });
+    jQuery("#codeform").submit(function(e) { execute($($("#luapane").children()[0]).offset()); });
 
     jQuery(window).resize(function(e) {
       var val = "calc(" + jQuery("#datalogpane").height() + "px - 2.8em)";
@@ -119,39 +214,72 @@ var onLoad = function() {
       luaEditor.refresh();
       jQuery(queryEditor.getScrollerElement()).css("height", val);
       queryEditor.refresh();
-      jQuery("#output").css("height", val);
+      jQuery(".outputtab").css("height", val);
     });
 
-    CodeMirror.commands.autocomplete = function(cm) {
-        CodeMirror.simpleHint(cm, CodeMirror.datalogHint);
-    }
-
-    var lineNum = true, theme = "lesser-dark";
-    editor = CodeMirror.fromTextArea(document.getElementById("datalog"), {
-        mode: "datalog",
-        lineNumbers: lineNum,
-        theme: theme,
-        extraKeys: {"Ctrl-Space": "autocomplete"}
-    });
-    queryEditor = CodeMirror.fromTextArea(document.getElementById("queries"), {
-        mode: "datalog",
-        lineNumbers: lineNum,
-        theme: theme,
-        extraKeys: {"Ctrl-Space": "autocomplete"}
-    });
-    luaEditor = CodeMirror.fromTextArea(document.getElementById("lua"), {
-        mode: "lua",
-        lineNumbers: lineNum,
-        theme: theme
-    });
     luaEditor.setValue(get("default.lua"));
     document.getElementById("submitbutton").disabled = false;
+    input.onchange();
     switc("ancestor");
-    window.setTimeout(function() {jQuery(window).resize()}, 0);
+  });
 };
-var execute = function() {
+
+var tableOutput;
+
+function tableOutputHandler() {
+    this.firstRowOut = false;
+    this.newQuery = function (q) {
+      //$("#tableoutput table:last").stupidtable();
+      $("#tableoutput").append($("<h3>").append(q));
+      this.firstRowOut = false;
+    };
+    this.newComment = function (c) {
+      $("#tableoutput").append($("<pre>").append(c));
+    };
+    this.newRow = function (arr) {
+      if (!this.firstRowOut) {
+        var thead = $("<thead>");
+        $("#tableoutput").append($("<table>").append(thead).append("<tbody>"));
+        var i = 1;
+        arr.map(function(v){thead.append($("<th>").append("column " + i++));});
+        this.firstRowOut = true;
+      }
+      var tr = $("<tr>");
+      arr.map(function(v) {
+        tr.append($("<td>").append(v));
+      });
+      $("#tableoutput table:last tbody").append(tr);
+
+    };
+    $("#tableoutput").html("");
+}
+
+var distributeOutput = function(v) {
+    //console.log(v);
+    var pat1 = "% QUERY ";
+    var pat2 = "% TSV ";
+    if (v.substr(0,pat1.length) === pat1) {
+      v = v.substr(pat1.length);
+      if (v.trim() === "") return;
+      if (v.substr(0,1) === "%") tableOutput.newComment(v);
+      else tableOutput.newQuery(v);
+      v = "% " + v;
+    } else if (v.substr(0,pat2.length) === pat2) {
+      v = v.substr(pat2.length);
+      tableOutput.newRow(v.split("\t"));
+      return;
+    }
+    addText("output", v + "\n");
+};
+
+var qtipcount = 0;
+
+var execute = function(oldPos) {
     if (document.getElementById("submitbutton").disabled) throw new Error("disabled!");
     document.getElementById("submitbutton").disabled = true;
+
+    $("body").removeClass("twocolumnlayout");
+
     try {
       datalogContent = editor.getValue();
     } catch (err) {
@@ -168,18 +296,36 @@ var execute = function() {
       queryContent = document.getElementById("queries").value;
     }
 
-    var Module = {};
-    //Module["noExitRuntime"] = true;
-    Module["noInitialRun"] = true;
-    Module["print"] = function(v) {
-        addText("output", v + "\n");
-    };
-    Module["arguments"] = ['-i', '-l', '/lib.lua', '/datalog.dl', '/queries.dl'];
+    var timer = null;
+
+    task.addListener("print",function(v) {
+        distributeOutput(v);
+        if (timer != null) {
+          clearTimeout(timer);
+          timer = null;
+        }
+        timer = window.setTimeout(function() {
+          //console.log("fired!");
+          jQuery(window).resize()
+          window.setTimeout(function() {
+            var newPos = $($("#luapane").children()[0]).offset();
+            if (newPos.top > oldPos.top) {
+              console.log("reflow!");
+              $("body").addClass("twocolumnlayout");
+              if (qtipcount++ < 2) $(".footer").qtip({content: {text:"It's down here :)",title:{text:"Where'd my code go?",button:true}},position:{adjust: {x: 50,y:25},my:'bottom left', at: 'top left'},show:{effect: function(offset){$(this).fadeIn(200);},event:false,ready:true},hide:false,style: {classes: 'ui-tooltip-shadow ui-tooltip-bootstrap'}});
+            } else if (newPos.top < oldPos.top) {
+              $("body").removeClass("twocolumnlayout");
+            }
+          }, 500);
+        }, 1000);
+    });
     var fileToBox = {'/lib\\.lua': luaEditor, '/datalog\\.dl': editor, '/queries\\.dl': queryEditor};
-    Module = CompiledModule(Module,wrapperPreInit);
     document.getElementById("output").innerHTML = "";
-    var rc = Module["run"]();
+    tableOutput = new tableOutputHandler();
+    task.addListener("runFinished",function(rc){
+    //$("#tableoutput table:last").stupidtable();
     jQuery("#output")[(rc === 0) ? "removeClass" : "addClass"]("error");
+    tab("t1","#outputtabcontainer");
     if (rc !== 0) {
       // find error line and highlight
       Object.keys(fileToBox).map(function(v) {
@@ -190,6 +336,8 @@ var execute = function() {
       });
     }
     document.getElementById("submitbutton").disabled = false;
+    });
+    task.sendQuery('runDatalog',datalogContent,luaContent,queryContent);
     return false;
 };
 
