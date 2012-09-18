@@ -138,6 +138,7 @@ data["u7"] = new example(get("mitre-u7-clauses.dl"),get("mitre-u7-queries.dl"));
 
 
 var editor, luaEditor, queryEditor;
+//window.geteditor = function() { return editor; };
 var switc = function(v) {
     var oldPos = $($("#luapane").children()[0]).offset();
     try {
@@ -161,19 +162,23 @@ var onLoad = function() {
         CodeMirror.simpleHint(cm, CodeMirror.datalogHint);
     }
     var lineNum = true;
+    var editormap = function() { return {"datalog": editor, "lua":luaEditor, "query": queryEditor}; };
     editor = CodeMirror.fromTextArea(document.getElementById("datalog"), {
         mode: "datalog",
         lineNumbers: lineNum,
-        extraKeys: {"Ctrl-Space": "autocomplete"}
+        extraKeys: {"Ctrl-Space": "autocomplete"},
+        onChange: function() {window["editorOnChange"](arguments[0], arguments[1], editormap());}
     });
     queryEditor = CodeMirror.fromTextArea(document.getElementById("queries"), {
         mode: "datalog",
         lineNumbers: lineNum,
-        extraKeys: {"Ctrl-Space": "autocomplete"}
+        extraKeys: {"Ctrl-Space": "autocomplete"},
+        onChange: function() {window["editorOnChange"](arguments[0], arguments[1], editormap());}
     });
     luaEditor = CodeMirror.fromTextArea(document.getElementById("lua"), {
         mode: "lua",
-        lineNumbers: lineNum
+        lineNumbers: lineNum,
+        onChange: function() {window["editorOnChange"](arguments[0], arguments[1], editormap());}
     });
 
 
@@ -229,7 +234,7 @@ var tableOutput;
 function tableOutputHandler() {
     this.firstRowOut = false;
     this.newQuery = function (q) {
-      //$("#tableoutput table:last").stupidtable();
+      $("#tableoutput table:last").tablesorter(); //.stupidtable();
       $("#tableoutput").append($("<h3>").append(q));
       this.firstRowOut = false;
     };
@@ -239,9 +244,10 @@ function tableOutputHandler() {
     this.newRow = function (arr) {
       if (!this.firstRowOut) {
         var thead = $("<thead>");
+        var tr = $("<tr>"); thead.append(tr);
         $("#tableoutput").append($("<table>").append(thead).append("<tbody>"));
         var i = 1;
-        arr.map(function(v){thead.append($("<th>").append("column " + i++));});
+        arr.map(function(v){tr.append($("<th>").append("column " + i++));});
         this.firstRowOut = true;
       }
       var tr = $("<tr>");
@@ -323,7 +329,7 @@ var execute = function(oldPos) {
     document.getElementById("output").innerHTML = "";
     tableOutput = new tableOutputHandler();
     task.addListener("runFinished",function(rc){
-    //$("#tableoutput table:last").stupidtable();
+    $("#tableoutput table:last").tablesorter(); //.stupidtable();
     jQuery("#output")[(rc === 0) ? "removeClass" : "addClass"]("error");
     tab("t1","#outputtabcontainer");
     if (rc !== 0) {

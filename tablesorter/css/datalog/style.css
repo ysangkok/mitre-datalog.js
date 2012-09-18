@@ -1,0 +1,138 @@
+/* Blue Theme */
+table.tablesorter {
+	margin: 10px 0 15px;
+	text-align: left;
+	border-spacing: 0;
+}
+table.tablesorter,
+table.tablesorter th,
+table.tablesorter td {
+	border: rgba(0,0,0,0.25) 1px solid;
+	background-clip: padding-box;
+}
+
+table.tablesorter .header,
+table.tablesorter .tablesorter-header,
+table.tablesorter th.headerSortUp,
+table.tablesorter th.tablesorter-headerSortUp,
+table.tablesorter th.headerSortDown,
+table.tablesorter th.tablesorter-headerSortDown {
+	background-color: inherit;
+}
+
+body.light table.tablesorter .header,
+body.light table.tablesorter .tablesorter-header {
+	/* black double arrow */
+	background-image: url(data:image/gif;base64,R0lGODlhFQAJAIAAACMtMP///yH5BAEAAAEALAAAAAAVAAkAAAIXjI+AywnaYnhUMoqt3gZXPmVg94yJVQAAOw==);
+}
+body.dark table.tablesorter .header,
+body.dark table.tablesorter .tablesorter-header {
+	/* white double arrow */
+	background-image: url(data:image/gif;base64,R0lGODlhFQAJAIAAAP///////yH5BAEAAAEALAAAAAAVAAkAAAIXjI+AywnaYnhUMoqt3gZXPmVg94yJVQAAOw==);
+	/* image */
+	/* background-image: url(black-bg.gif); */
+}
+table.tablesorter .header,
+table.tablesorter .tablesorter-header {
+	background-repeat: no-repeat;
+	background-position: center right;
+	padding: 4px 20px 4px 4px;
+	cursor: pointer;
+}
+table.tablesorter tbody td {
+	padding: 4px;
+	vertical-align: top;
+}
+body.light table.tablesorter th.headerSortUp,
+body.light table.tablesorter th.tablesorter-headerSortUp {
+	/* black asc arrow */
+	background-image: url(data:image/gif;base64,R0lGODlhFQAEAIAAACMtMP///yH5BAEAAAEALAAAAAAVAAQAAAINjB+gC+jP2ptn0WskLQA7);
+}
+body.dark table.tablesorter th.headerSortUp,
+body.dark table.tablesorter th.tablesorter-headerSortUp {
+	/* white asc arrow */
+	background-image: url(data:image/gif;base64,R0lGODlhFQAEAIAAAP///////yH5BAEAAAEALAAAAAAVAAQAAAINjB+gC+jP2ptn0WskLQA7);
+	/* image */
+	/* background-image: url(black-asc.gif); */
+}
+body.light table.tablesorter th.headerSortDown,
+body.light table.tablesorter th.tablesorter-headerSortDown {
+	/* black desc arrow */
+	background-image: url(data:image/gif;base64,R0lGODlhFQAEAIAAACMtMP///yH5BAEAAAEALAAAAAAVAAQAAAINjI8Bya2wnINUMopZAQA7);
+}
+body.dark table.tablesorter th.headerSortDown,
+body.dark table.tablesorter th.tablesorter-headerSortDown {
+	/* white desc arrow */
+	background-image: url(data:image/gif;base64,R0lGODlhFQAEAIAAAP///////yH5BAEAAAEALAAAAAAVAAQAAAINjI8Bya2wnINUMopZAQA7);
+	/* image */
+	/* background-image: url(black-desc.gif); */
+}
+/* used to hide a tbody while rebuilding to speed it up */
+table.tablesorter .tablesorter-hidden {
+	display: none;
+}
+
+/* Zebra Widget - row alternating colors */
+table.tablesorter tr.odd td {
+	background-color: #ebf2fa;
+}
+table.tablesorter tr.even td {
+	background-color: #fff;
+}
+
+/* Column Widget - column sort colors */
+.tablesorter td.primary,
+.tablesorter tr.odd td.primary {
+	background-color: #99b3e6;
+}
+.tablesorter tr.even td.primary {
+	background-color: #c2d1f0;
+}
+
+.tablesorter td.secondary,
+.tablesorter tr.odd td.secondary {
+	background-color: #c2d1f0;
+}
+.tablesorter tr.even td.secondary {
+	background-color: #d6e0f5;
+}
+
+.tablesorter td.tertiary,
+.tablesorter tr.odd td.tertiary {
+	background-color: #d6e0f5;
+}
+.tablesorter tr.even td.tertiary {
+	background-color: #ebf0fa;
+}
+
+/* hovered row colors */
+/*
+table.tablesorter tbody tr:hover td,
+table.tablesorter tbody tr.even:hover td {
+	background: #d9d9d9;
+}
+table.tablesorter tbody tr.odd:hover td {
+	background: #bfbfbf;
+}
+*/
+
+/* filter widget */
+table.tablesorter input.tablesorter-filter,
+table.tablesorter select.tablesorter-filter {
+	width: 95%;
+	height: inherit;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+table.tablesorter tr.tablesorter-filter,
+table.tablesorter tr.tablesorter-filter td {
+	text-align: center;
+	background: #fff;
+}
+/* optional disabled input styling */ 
+table.tablesorter input.tablesorter-filter.disabled,
+table.tablesorter select.tablesorter-filter.disabled {
+	opacity: 0.5;
+	filter: alpha(opacity=50);
+}

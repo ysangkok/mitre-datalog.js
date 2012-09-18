@@ -44,6 +44,9 @@ self.onmessage = function (oEvent) {
   <script src="css_browser_selector_dev.js"></script>
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js"></script>
+  <script src="tablesorter/js/jquery.tablesorter.min.js"></script>
+  <script src="tablesorter/js/jquery.tablesorter.widgets.min.js"></script>
+  <link type="text/css" href="tablesorter/css/datalog/style.css" rel="stylesheet">
   <script src="prefixfree.min.js"></script>
   <script src="prefixfree.jquery.js"></script>
   <script src="jquery.qtip.min.js"></script>
@@ -69,15 +72,129 @@ self.onmessage = function (oEvent) {
   <script src="CodeMirror-2.33/lib/util/simple-hint.js"></script>
   <link rel="stylesheet" href="CodeMirror-2.33/lib/util/simple-hint.css">
   <script src="datalog-hint.js"></script>
-  <script src="amplify-1.1.0/src/store/amplify.store.js"></script>
+<script src="es6-shim/es6-shim.js"></script>
+<script>/*the only js is to continuously checking the value of the dropdown. for posterity*/
+//var j = {"datalogchange": 1, "luachange": 1, "querychange": 1};
 
+//var i = setInterval(function(){$("#trace").val($("input[name=line-style]:checked").val());},100);
+
+window["editorOnChange"] = function(editor, change, nameToBox) {
+/*
+        console.log(arguments);
+        var editor = arguments[0], change = arguments[1];
+        var type;
+        if (change["text"])
+          type="deletion";
+        else
+          type="addition";
+        var boxToClass = new Map();
+        boxToClass.set(nameToBox["datalog"], "datalogchange");
+        boxToClass.set(nameToBox["lua"], "luachange");
+        boxToClass.set(nameToBox["query"], "querychange");
+
+        var cl = boxToClass.get(editor);
+        var id = cl + "-" + j[cl];
+        $("#image-dropdown").append(
+          $("<input type='radio' id='"+id+"' name='line-style-" + cl + "' value='"+j[cl]+"' " + (j[cl] !== 1 ? "" : "checked") + " />")
+        ).append(
+          $("<label for='" + id + "'>").addClass(cl).addClass(type).append(
+            $("<div class='changedcontent'>").append(change["text"] ? change.text : "no text available")
+          ).append(
+            $("<div class='time'>").append(new Date().toString())
+          )
+        );
+        j[cl]++;
+*/
+};
+</script>
 
   <script src="wrapper.js"></script>
   <link type="text/css" rel="stylesheet" href="wrapper.css">
+<!--
+<style>
+/*o.v.*/
 
+#image-dropdown {
+    /*style the "box" in its minimzed state*/
+    border:1px solid #999; width:300px; height:75px; overflow:hidden;
+    /*animate collapsing the dropdown from open to closed state (v. fast)*/
+    -moz-transition: height 0.1s; 
+    -webkit-transition: height 0.1s; 
+    -ms-transition: height 0.1s;  
+    -o-transition: height 0.1s;  
+    transition: height 0.1s;
+    background-color: #fff;
+}
+#image-dropdown:hover {
+    /*when expanded, the dropdown will get native means of scrolling*/
+    height:600px; overflow-y:scroll;
+    /*nice and smooth expand - speed this up at your preference or remove animation altogether*/
+    -moz-transition: height 0.5s; 
+    -webkit-transition: height 0.5s; 
+    -ms-transition: height 0.5s;  
+    -o-transition: height 0.5s;  
+    transition: height 0.5s;
+}
+#image-dropdown input {
+    /*hide the nasty default radio buttons. like, completely!*/
+    position:absolute;top:0;left:0;opacity:0;
+}
+
+
+#image-dropdown label {
+    color: black;
+    overflow:hidden;
+    /*style the labels to look like dropdown options, kinda*/
+    display:none; margin:2px; height:46px;
+    border-left: 0.2em solid transparent;
+    font-size: 0.8em; 
+    text-overflow: ellipsis;
+    text-wrap: none;
+    white-space: nowrap;
+    font-weight: lighter;
+    
+}
+#image-dropdown label.addition::before {
+    content: 'Addition';
+}
+#image-dropdown label.datalogchange {
+    border-left: 0.2em solid red;
+}
+#image-dropdown label.luachange {
+    border-left: 0.2em solid green;
+}
+#image-dropdown label.querychange {
+    border-left: 0.2em solid blue;
+}
+#image-dropdown:hover label{
+    /*this is how labels render in the "expanded" state. we want to see only the selected radio button in the collapsed menu, and all of them when expanded*/
+    display:block;
+}
+#image-dropdown label:hover {
+    opacity:0.75;
+}
+#image-dropdown input:checked + label {
+    /*tricky! labels immediately following a checked radio button (with our markup they are semantically related) should be fully opaque regardless of hover, and they should always be visible (i.e. even in the collapsed menu*/
+    opacity: 1 !important; font-weight:bold !important; display:block;
+}
+
+/*pfft, nothing as cool here, just the value trace
+#trace {margin:0 0 20px;}*/
+
+#historycontainer { position:absolute; top:0em; left: 65%; z-index: 100; }
+.header.row { overflow:visible; }
+</style>
+-->
 </head>
 <body>
   <div class="header row">
+<!--
+    <div id="historycontainer">
+<input type="text" value="" id="trace"/>
+<div id="image-dropdown" >
+</div>
+    </div>
+-->
     <div id="selectdiv">
     <label for="select">Theme:</label>
     <select id="select">
@@ -85,9 +202,9 @@ self.onmessage = function (oEvent) {
     <option>blackboard</option>
     <option>cobalt</option>
     <option>eclipse</option>
-    <option>elegant</option>
+    <option selected>elegant</option>
     <option>erlang-dark</option>
-    <option selected>lesser-dark</option>
+    <option>lesser-dark</option>
     <option>monokai</option>
     <option>neat</option>
     <option>night</option>
@@ -96,7 +213,7 @@ self.onmessage = function (oEvent) {
     <option>xq-dark</option>
     </select>
     </div>
-    <h2>Datalog.js (using the <a href="http://datalog.sourceforge.net/">MITRE lightweight Datalog</a>)</h2>
+    <div><h2>Datalog.js</h2> (using <a href="http://datalog.sourceforge.net/">MITRE lightweight Datalog</a>)</div>
     Examples:
     <ul id="examples">
     </ul>
@@ -113,6 +230,7 @@ self.onmessage = function (oEvent) {
         <div class="t1">
           <div class="outputtab">
             <pre id="output">
+            Loading...
             </pre>
           </div>
         </div>
