@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <title>Datalog.js</title>
-<script type="text/js-worker" src="datalog.js"></script>
+<script type="text/js-worker" src="datalog-2.2/datalog.js"></script>
 <script type="text/js-worker">
 var queryableFunctions = {
   runDatalog: function(clauses, lua, queries) {
@@ -213,8 +213,8 @@ window["editorOnChange"] = function(editor, change, nameToBox) {
     <option>xq-dark</option>
     </select>
     </div>
-    <div><h2>Datalog.js</h2> (using <a href="http://datalog.sourceforge.net/">MITRE lightweight Datalog</a>)</div>
-    Examples:
+    <div><h2>Datalog.js</h2> (not affiliated with, but using <a href="http://datalog.sourceforge.net/">MITRE lightweight Datalog</a>)</div>
+    Examples (click to overwrite and execute):
     <ul id="examples">
     </ul>
   </div> 
@@ -263,7 +263,7 @@ window["editorOnChange"] = function(editor, change, nameToBox) {
   </div> 
   <div class="footer row">
     <div id="footerpane" class="pane">
-      <input id="submitbutton" class="button" type="submit" disabled>
+      <input id="submitbutton" class="button" type="submit" disabled value="Execute">
     </div>
   </div>
   </form>
