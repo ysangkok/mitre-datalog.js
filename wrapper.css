@@ -149,7 +149,7 @@ body#lesser-dark .CodeMirror, body#lesser-dark .outputtab pre
 }
 .tabs li, #examples li
 {
-    display: inline
+    display: inline-block
 }
 .pane
 {
@@ -164,7 +164,7 @@ body#lesser-dark .CodeMirror, body#lesser-dark .outputtab pre
 }
 #examples li>a
 {
-    padding: .5em
+    padding: .25em
 }
 .error
 {
