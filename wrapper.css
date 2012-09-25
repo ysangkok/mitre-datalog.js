@@ -1,3 +1,17 @@
+.tabs a {
+	white-space: pre;
+}
+.CodeMirror { height: calc(100% - 2.8em); }
+.CodeMirror-scroll {height: 100%; overflow-y: auto; overflow-x: auto;}
+.body > table {
+	width: 100%;
+	padding: 0.5em;
+	height: 100%;
+}
+.body > table > tbody > tr > td {
+	width: 30%;
+	height:100%;
+}
 #tableoutput
 {
     font-size: .8em
@@ -5,10 +19,6 @@
 .tabs a:focus
 {
     outline: none
-}
-body.twocolumnlayout #outputpane
-{
-    width: 100%
 }
 .tabs, .footer.row, .header.row
 {
@@ -100,12 +110,9 @@ body.dark select, body.dark input
 }
 .header.row
 {
-    height: 4em;
-    top: 0;
     padding-top: .5em;
     padding-left: 1em;
     padding-right: 1em;
-    overflow: auto
 }
 .body.row
 {
@@ -126,11 +133,6 @@ body#lesser-dark .CodeMirror, body#lesser-dark .outputtab pre
 {
     font-size: .8em
 }
-.outputtab, .pane textarea
-{
-    width: 33%;
-    height: calc(100% - 3em)
-}
 #output
 {
     white-space: pre;
@@ -140,10 +142,6 @@ body#lesser-dark .CodeMirror, body#lesser-dark .outputtab pre
 {
     overflow: auto;
     padding-bottom: .5em
-}
-.outputtab
-{
-    width: 100%
 }
 .outputtab>*
 {
@@ -156,10 +154,9 @@ body#lesser-dark .CodeMirror, body#lesser-dark .outputtab pre
 .pane
 {
     padding-top: 1px;
-    padding-left: 1em;
-    padding-right: 1em;
-    height: calc(100% - 1px);
-    display: block
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+    vertical-align: top;
 }
 #submitbutton
 {
@@ -200,21 +197,13 @@ body#lesser-dark .CodeMirror, body#lesser-dark .outputtab pre
 }
 .tabcontainer
 {
-    display: inline-block;
-    position: relative
+	position:relative;
 }
 .t1, .t2
 {
-    position: absolute;
-    top: 1.8em;
-    left: 0;
-    width: 100%;
-    height: calc(100% - 1.5em)
-}
-.t2>textarea
-{
-    width: 100%;
-    height: 100%
+	position:absolute;
+	margin-top: -1px;
+	width: 100%;
 }
 .tabs>li, .fline
 {
@@ -247,7 +236,6 @@ body#lesser-dark .CodeMirror, body#lesser-dark .outputtab pre
 }
 #outputtabcontainer
 {
-    width: 100%
 }
 body.light .tnl a
 {
@@ -424,33 +412,12 @@ body.light .button:active
     background: -webkit-gradient(linear,left top,left bottom,from(#ededed),to(#fff));
     background: -moz-linear-gradient(top,#ededed,#fff)
 }
-#outputpane
-{
-    float: right;
-    min-width: 25%;
-    max-width: 55%
-}
-#datalogpane
-{
-    float: left;
-    min-width: 30%
-}
-#datalog
-{
-    width: 100%
-}
-#tabcontainer
-{
-    min-width: 40%
-}
 #footerpane
 {
-    display: inline-block;
-    width: calc(100% - 2em);
     text-align: right
 }
 #submitbutton
 {
-    height: 100%
+	padding: 0.25em 0.5em;
 }
 .outputtab * { background-color: inherit; }

@@ -135,11 +135,18 @@ var data = {
 //for i in *.dl; do python -c "import json; print(\"'$(echo $i| cut -d. -f1)':\" + json.dumps(open('$i').read()));" >> out; done
 
 data["u7"] = new example(get("mitre-u7-clauses.dl"),get("mitre-u7-queries.dl"));
+data["trains-exercise"] = new example(get("trains-exercise.dl"),get("trains-queries.dl"));
+data["trains-solution"] = new example(get("trains-solution.dl"),get("trains-queries.dl"));
 
 
 var editor, luaEditor, queryEditor;
 //window.geteditor = function() { return editor; };
+
+var contentChanged = false;
+var loaded = false;
+
 var switc = function(v) {
+    if (contentChanged && loaded) if (!confirm("Changes will be overwritten. Really continue?")) return;
     var oldPos = $($("#luapane").children()[0]).offset();
     try {
       editor.setValue(data[v].clauses);
@@ -153,6 +160,8 @@ var switc = function(v) {
     }
     if (data[v].queries !== "") tab("t2");
     execute(oldPos);
+    loaded = true;
+    contentChanged = false;
 }
 
 var task;
@@ -161,24 +170,27 @@ var onLoad = function() {
     CodeMirror.commands.autocomplete = function(cm) {
         CodeMirror.simpleHint(cm, CodeMirror.datalogHint);
     }
-    var lineNum = true;
+    var lineNum = true, lineWrap = true;
     var editormap = function() { return {"datalog": editor, "lua":luaEditor, "query": queryEditor}; };
     editor = CodeMirror.fromTextArea(document.getElementById("datalog"), {
         mode: "datalog",
         lineNumbers: lineNum,
+	lineWrapping: lineWrap,
         extraKeys: {"Ctrl-Space": "autocomplete"},
-        onChange: function() {window["editorOnChange"](arguments[0], arguments[1], editormap());}
+        onChange: function() {contentChanged=true; window["editorOnChange"](arguments[0], arguments[1], editormap());}
     });
     queryEditor = CodeMirror.fromTextArea(document.getElementById("queries"), {
         mode: "datalog",
         lineNumbers: lineNum,
+	lineWrapping: lineWrap,
         extraKeys: {"Ctrl-Space": "autocomplete"},
-        onChange: function() {window["editorOnChange"](arguments[0], arguments[1], editormap());}
+        onChange: function() {contentChanged=true; window["editorOnChange"](arguments[0], arguments[1], editormap());}
     });
     luaEditor = CodeMirror.fromTextArea(document.getElementById("lua"), {
         mode: "lua",
         lineNumbers: lineNum,
-        onChange: function() {window["editorOnChange"](arguments[0], arguments[1], editormap());}
+	lineWrapping: lineWrap,
+        onChange: function() {contentChanged=true; window["editorOnChange"](arguments[0], arguments[1], editormap());}
     });
 
 
@@ -209,10 +221,11 @@ var onLoad = function() {
     jQuery("#codeform").submit(function(e) { execute($($("#luapane").children()[0]).offset()); });
 
     jQuery(window).resize(function(e) {
-      var val = "calc(" + jQuery("#datalogpane").height() + "px - 2.8em)";
+      var val = "calc(" + jQuery(".body").height() + "px - 3.0em)";
       if (jQuery.browser.webkit) val = "-webkit-" + val;
       else if (jQuery.browser.mozilla) val = "-moz-" + val;
       else if (jQuery.browser.opera) val = "-o-" + val;
+//      jQuery(".CodeMirror").css("height",val);
       jQuery(editor.getScrollerElement()).css("height", val);
       editor.refresh();
       jQuery(luaEditor.getScrollerElement()).css("height", val);
@@ -225,7 +238,8 @@ var onLoad = function() {
     luaEditor.setValue(get("default.lua"));
     document.getElementById("submitbutton").disabled = false;
     input.onchange();
-    switc("ancestor");
+    switc("trains-exercise");
+    jQuery(window).resize();
   });
 };
 
@@ -310,20 +324,6 @@ var execute = function(oldPos) {
           clearTimeout(timer);
           timer = null;
         }
-        timer = window.setTimeout(function() {
-          //console.log("fired!");
-          jQuery(window).resize()
-          window.setTimeout(function() {
-            var newPos = $($("#luapane").children()[0]).offset();
-            if (newPos.top > oldPos.top) {
-              console.log("reflow!");
-              $("body").addClass("twocolumnlayout");
-              if (qtipcount++ < 2) $(".footer").qtip({content: {text:"It's down here :)",title:{text:"Where'd my code go?",button:true}},position:{adjust: {x: 50,y:25},my:'bottom left', at: 'top left'},show:{effect: function(offset){$(this).fadeIn(200);},event:false,ready:true},hide:false,style: {classes: 'ui-tooltip-shadow ui-tooltip-bootstrap'}});
-            } else if (newPos.top < oldPos.top) {
-              $("body").removeClass("twocolumnlayout");
-            }
-          }, 500);
-        }, 1000);
     });
     var fileToBox = {'/lib\\.lua': luaEditor, '/datalog\\.dl': editor, '/queries\\.dl': queryEditor};
     document.getElementById("output").innerHTML = "";

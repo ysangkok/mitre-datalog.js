@@ -49,8 +49,8 @@ self.onmessage = function (oEvent) {
   <link type="text/css" href="tablesorter/css/datalog/style.css" rel="stylesheet">
   <script src="prefixfree.min.js"></script>
   <script src="prefixfree.jquery.js"></script>
-  <script src="jquery.qtip.min.js"></script>
-  <link type="text/css" rel="stylesheet" href="jquery.qtip.css">
+<!--  <script src="jquery.qtip.min.js"></script> 
+  <link type="text/css" rel="stylesheet" href="jquery.qtip.css"> -->
 
   <link type="text/css" rel="stylesheet" href="CodeMirror-2.33/lib/codemirror.css">
   <script type="text/javascript" src="CodeMirror-2.33/lib/codemirror.js"></script>
@@ -72,7 +72,7 @@ self.onmessage = function (oEvent) {
   <script src="CodeMirror-2.33/lib/util/simple-hint.js"></script>
   <link rel="stylesheet" href="CodeMirror-2.33/lib/util/simple-hint.css">
   <script src="datalog-hint.js"></script>
-<script src="es6-shim/es6-shim.js"></script>
+<!-- <script src="es6-shim/es6-shim.js"></script> -->
 <script>/*the only js is to continuously checking the value of the dropdown. for posterity*/
 //var j = {"datalogchange": 1, "luachange": 1, "querychange": 1};
 
@@ -220,7 +220,26 @@ window["editorOnChange"] = function(editor, change, nameToBox) {
   </div> 
   <form id="codeform" action="#" method="get" onsubmit="javascript:return false;">
   <div class="body row scroll-y">
-    <div class="pane" id="outputpane">
+    <table><tr>
+    <td class="pane" id="datalogpane">
+      <div class="fline"><label for="datalog">Datalog program:</label></div>
+      <textarea id="datalog"></textarea>
+    </td>
+    <td class="pane" id="luapane">
+      <div class="tabcontainer" id="tabcontainer">
+        <ul class="tabs">
+          <li class="tnl t1l"><label for="lua"><a href="javascript:tab('t1','#tabcontainer');">Lua</a></label></li>
+          <li class="tnl t2l"><label for="queries"><a href="javascript:tab('t2','#tabcontainer');">Datalog queries</a></label></li>
+        </ul>
+        <div class="t1">
+          <textarea id="lua"></textarea>
+        </div>
+        <div class="t2">
+          <textarea id="queries"></textarea>
+        </div>
+      </div>
+    </td>
+    <td class="pane" id="outputpane">
 <!--      <div class="fline">Output:</div>-->
       <div class="tabcontainer taboneactive" id="outputtabcontainer">
         <ul class="tabs">
@@ -241,25 +260,9 @@ window["editorOnChange"] = function(editor, change, nameToBox) {
           </div>
         </div>
       </div>
-    </div>
-    <div class="pane" id="datalogpane">
-      <div class="fline"><label for="datalog">Datalog program:</label></div>
-      <textarea id="datalog"></textarea>
-    </div>
-    <div class="pane" id="luapane">
-      <div class="tabcontainer taboneactive" id="tabcontainer">
-        <ul class="tabs">
-          <li class="tnl t1l"><label for="lua"><a href="javascript:tab('t1','#tabcontainer');">Lua</a></label></li>
-          <li class="tnl t2l"><label for="queries"><a href="javascript:tab('t2','#tabcontainer');">Datalog queries</a></label></li>
-        </ul>
-        <div class="t1">
-          <textarea id="lua"></textarea>
-        </div>
-        <div class="t2">
-          <textarea id="queries"></textarea>
-        </div>
-      </div>
-    </div>
+    </td>
+    </tr>
+    </table>
   </div> 
   <div class="footer row">
     <div id="footerpane" class="pane">

@@ -1,0 +1,3 @@
+direct_connection(From, To)?
+schedule(Departuretime, Platform)?
+trips(Departuretime, Transferplace, Arrivalplace)?

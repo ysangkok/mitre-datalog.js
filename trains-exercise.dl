@@ -1,0 +1,38 @@
+% Given are the following facts:
+
+% train(Trainnumber, Traintype)
+train(3219,"IC").
+train(1390,"IC").
+train(1231,"IC").
+train(1232,"IC").
+train(9900,"ICE").
+train(9720,"ICE").
+
+% stops_in(Trainnumber, Place, Platform, Arrivaltime, Departuretime)
+stops_in(9720, paris, 3, 1104, 1115).
+stops_in(9720, heidelberg, 12, 832, 839).
+stops_in(9900, paris, 1, 1950, 1955).
+stops_in(9900, moscow, 8, 2353, 2358).
+stops_in(1231, mainz, 9, 1950, 1955).
+stops_in(1231, darmstadt, 7, 2030, 2035).
+stops_in(1390, frankfurt, 5, 1558, 1620).
+stops_in(1390, darmstadt, 1, 1749, 1750).
+stops_in(3219, heidelberg, 13, 1700, 1702).
+stops_in(3219, darmstadt, 2, 1800, 1802).
+stops_in(1232, darmstadt, 2, 520, 525).
+stops_in(1232, heidelberg, 12, 540, 545).
+
+% Exercise A:
+% Define the Datalog relation "direct_connection(A, B)", so that A and B are places and there is a direct connection between them. It doesn't matter if the train goes from A to B or B to A.
+
+direct_connection(Place1, Place2) :- stops_in(Train, Place1, X, Y, Z), stops_in(Train, Place2, V, W, Q).
+
+% Exercise B:
+% Mr Meier wants to leave Darmstadt at 18:00. Write the relation "schedule(Departuretime, Platform)", matching all ICE or IC trains leaving Darmstadt after 18:00.
+
+% Solve yourself or load the solution linked above
+
+% Exercise C:
+% Frau Müller wants to know where she can get to from Darmstadt, changing trains exactly one time. Because she is old and frail, she is only interested in connections that she can reach without changing platforms. Define the relation "trips(Departuretime, Transferstation, Destinationplace)".
+
+% Solve yourself or load the solution linked above
