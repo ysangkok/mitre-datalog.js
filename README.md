@@ -1,6 +1,8 @@
 Instructions
 ------------
 
+Run `build.sh` or do the following:
+
 1. ``git clone <repository git url>``
 1. ``cd datalog.js``
 1. ``wget -O - "http://downloads.sourceforge.net/project/datalog/datalog/2.2/datalog-2.2.tar.gz" | tar xz``
