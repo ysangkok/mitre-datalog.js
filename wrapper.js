@@ -1,4 +1,7 @@
-(function(){
+/**
+ * @param options: '{ dataDir: './data' }'
+ */
+function wrapper(options){
 "use strict";
   function QueryableWorker (sURL, fDefListener, fOnError) {
     var oInstance = this, oWorker = new Worker(sURL), oListeners = {};
@@ -108,7 +111,7 @@ var example = function(clauses, queries) {
 };
 
 //for i in *.dl; do python -c "import json; print(\"'$(echo $i| cut -d. -f1)':\" + json.dumps(open('$i').read()));" >> out; done
-var dataDir = './data';
+var dataDir = options.dataDir;
 var data = {};
 $.map(JSON.parse(get(dataDir + "/queries.json")), function(v,k) { data[k] = new example(v) ;});
 data["u7"]              = new example(get(dataDir + "/mitre-u7-clauses.dl"), get("data/mitre-u7-queries.dl"));
@@ -327,4 +330,4 @@ var execute = function(oldPos) {
 window["tab"] = tab;
 
 jQuery(document).ready(onLoad);
-})();
+};
