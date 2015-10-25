@@ -112,12 +112,18 @@ var example = function(clauses, queries) {
 
 //for i in *.dl; do python -c "import json; print(\"'$(echo $i| cut -d. -f1)':\" + json.dumps(open('$i').read()));" >> out; done
 var dataDir = options.dataDir;
-var data = {};
-$.map(JSON.parse(get(dataDir + "/queries.json")), function(v,k) { data[k] = new example(v) ;});
-data["u7"]              = new example(get(dataDir + "/mitre-u7-clauses.dl"), get("data/mitre-u7-queries.dl"));
-data["trains-exercise"] = new example(get(dataDir + "/trains-exercise.dl"),  get("data/trains-queries.dl"));
-data["trains-solution"] = new example(get(dataDir + "/trains-solution.dl"),  get("data/trains-queries.dl"));
+var dataDirIndex = JSON.parse(get(dataDir + "/queries.json"));
 
+var data = {};
+
+$.map(dataDirIndex.databases, function(v,k) {
+  if (v.clauses) {
+    data[k] = new example(v.clauses);
+  }
+  else if (v.clauseFile && v.queryFile) {
+    data[k] = new example(get(dataDir + "/" + v.clauseFile), get(dataDir + "/" + v.queryFile));
+  }
+});
 
 var editor, luaEditor, queryEditor;
 //window.geteditor = function() { return editor; };
@@ -218,7 +224,22 @@ var onLoad = function() {
     luaEditor.setValue(get("default.lua"));
     document.getElementById("submitbutton").disabled = false;
     input.onchange();
-    switc("trains-exercise");
+    if (dataDirIndex.initialDatabase) {
+      var db = data[dataDirIndex.initialDatabase];
+      if (db) {
+        if (db.clauses) {
+          switc(dataDirIndex.initialDatabase);
+        } else {
+          jQuery('#output').html("Database '" + dataDirIndex.initialDatabase + "' does not contain any clauses.");
+        }
+      } else {
+        jQuery("#output")
+          .addClass("error")
+          .html("Database '" + dataDirIndex.initialDatabase + "' doesn't exist.<br><br>Please select an existing one.");
+      }
+    } else {
+        jQuery('#output').html('Please select a database.');
+    }
     jQuery(window).resize();
   });
 };
