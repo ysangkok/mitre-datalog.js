@@ -134,9 +134,9 @@ var data = {
 };
 //for i in *.dl; do python -c "import json; print(\"'$(echo $i| cut -d. -f1)':\" + json.dumps(open('$i').read()));" >> out; done
 
-data["u7"] = new example(get("mitre-u7-clauses.dl"),get("mitre-u7-queries.dl"));
-data["trains-exercise"] = new example(get("trains-exercise.dl"),get("trains-queries.dl"));
-data["trains-solution"] = new example(get("trains-solution.dl"),get("trains-queries.dl"));
+data["u7"]              = new example(get("data/mitre-u7-clauses.dl"), get("data/mitre-u7-queries.dl"));
+data["trains-exercise"] = new example(get("data/trains-exercise.dl"),  get("data/trains-queries.dl"));
+data["trains-solution"] = new example(get("data/trains-solution.dl"),  get("data/trains-queries.dl"));
 
 
 var editor, luaEditor, queryEditor;
