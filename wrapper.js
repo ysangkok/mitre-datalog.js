@@ -1,4 +1,7 @@
-(function(){
+/**
+ * @param options: '{ dataDir: './data' }'
+ */
+function wrapper(options){
 "use strict";
   function QueryableWorker (sURL, fDefListener, fOnError) {
     var oInstance = this, oWorker = new Worker(sURL), oListeners = {};
@@ -107,37 +110,20 @@ var example = function(clauses, queries) {
 	this.queries = queries || "";
 };
 
-var data = {
-    'ancestor': new example(trimLines("% Equality test\n\
-      ancestor(A, B) :-\n\
-        parent(A, B).\n\
-      ancestor(A, B) :-\n\
-        parent(A, C),\n\
-        D = C,      % Unification required\n\
-        ancestor(D, B).\n\
-      parent(john, douglas).\n\
-      parent(bob, john).\n\
-      parent(ebbon, bob).\n\
-      ancestor(A, B)?\n\
-    ")),
-    'bidipath': new example("% path test from Chen & Warren\nedge(a, b). edge(b, c). edge(c, d). edge(d, a).\npath(X, Y) :- edge(X, Y).\npath(X, Y) :- edge(X, Z), path(Z, Y).\npath(X, Y) :- path(X, Z), edge(Z, Y).\npath(X, Y)?\n"),
-    'laps': new example("% Laps Test\ncontains(ca, store, rams_couch, rams).\ncontains(rams, fetch, rams_couch, will).\ncontains(ca, fetch, Name, Watcher) :-\n    contains(ca, store, Name, Owner),\n    contains(Owner, fetch, Name, Watcher).\ntrusted(ca).\npermit(User, Priv, Name) :-\n    contains(Auth, Priv, Name, User),\n    trusted(Auth).\npermit(User, Priv, Name)?\n"),
-    'long': new example("abcdefghi(z123456789,\nz1234567890123456789,\nz123456789012345678901234567890123456789,\nz1234567890123456789012345678901234567890123456789012345678901234567890123456789).\n\nthis_is_a_long_identifier_and_tests_the_scanners_concat_when_read_with_a_small_buffer.\nthis_is_a_long_identifier_and_tests_the_scanners_concat_when_read_with_a_small_buffer?\n"),
-    'octal': new example("octal(1, \"\\5\").\noctal(2, \"\\7a\").\noctal(3, \"\\79\").\noctal(4, \"\\7531\").\noctal(5, \"a\\7\\n\").\noctal(6, \"a\\3\\3\").\noctal(7, \"\\377\").\noctal(8, \"\\200\").\noctal(X, Y)?\n"),
-    'path': new example("% path test from Chen & Warren\nedge(a, b). edge(b, c). edge(c, d). edge(d, a).\npath(X, Y) :- edge(X, Y).\npath(X, Y) :- edge(X, Z), path(Z, Y).\npath(X, Y)?\n"),
-    'pq': new example("% p q test from Chen & Warren\nq(X) :- p(X).\nq(a).\np(X) :- q(X).\nq(X)?\n"),
-    'revpath': new example("% path test from Chen & Warren\nedge(a, b). edge(b, c). edge(c, d). edge(d, a).\npath(X, Y) :- edge(X, Y).\npath(X, Y) :- path(X, Z), edge(Z, Y).\npath(X, Y)?\n"),
-    'says': new example("tpme(tpme1).\nms(m1,'TPME',tpme1,ek,tp).\nsays(TPME,M) :- tpme(TPME),ms(M,'TPME',TPME,A,B).\nsays(A,B)?\n"),
-    'tc': new example("% Transitive closure test from Guo & Gupta\n\nr(X, Y) :- r(X, Z), r(Z, Y).\nr(X, Y) :- p(X, Y), q(Y).\np(a, b).  p(b, d).  p(b, c).\nq(b).  q(c).\nr(a, Y)?\n"),
-    'true': new example("true.\ntrue?\n"),
-    'unequal': new example("pc(2190, 1300, 2, 80, 392).\npc(3289, 1100, 4, 160, 1281).\npc(3288, 1050, 2, 160, 682).\n\n% Finden Sie die Festplattengrößen, die\n% in mindestens zwei PCs vorkommen.\ne(B) :- pc(A, X1, X2, B, X3), pc(C, X4, X5, B, X6), unequal(A,C).\ne(B)?")
-};
 //for i in *.dl; do python -c "import json; print(\"'$(echo $i| cut -d. -f1)':\" + json.dumps(open('$i').read()));" >> out; done
+var dataDir = options.dataDir;
+var dataDirIndex = JSON.parse(get(dataDir + "/queries.json"));
 
-data["u7"] = new example(get("mitre-u7-clauses.dl"),get("mitre-u7-queries.dl"));
-data["trains-exercise"] = new example(get("trains-exercise.dl"),get("trains-queries.dl"));
-data["trains-solution"] = new example(get("trains-solution.dl"),get("trains-queries.dl"));
+var data = {};
 
+$.map(dataDirIndex.databases, function(v,k) {
+  if (v.clauses) {
+    data[k] = new example(v.clauses);
+  }
+  else if (v.clauseFile && v.queryFile) {
+    data[k] = new example(get(dataDir + "/" + v.clauseFile), get(dataDir + "/" + v.queryFile));
+  }
+});
 
 var editor, luaEditor, queryEditor;
 //window.geteditor = function() { return editor; };
@@ -238,7 +224,22 @@ var onLoad = function() {
     luaEditor.setValue(get("default.lua"));
     document.getElementById("submitbutton").disabled = false;
     input.onchange();
-    switc("trains-exercise");
+    if (dataDirIndex.initialDatabase) {
+      var db = data[dataDirIndex.initialDatabase];
+      if (db) {
+        if (db.clauses) {
+          switc(dataDirIndex.initialDatabase);
+        } else {
+          jQuery('#output').html("Database '" + dataDirIndex.initialDatabase + "' does not contain any clauses.");
+        }
+      } else {
+        jQuery("#output")
+          .addClass("error")
+          .html("Database '" + dataDirIndex.initialDatabase + "' doesn't exist.<br><br>Please select an existing one.");
+      }
+    } else {
+        jQuery('#output').html('Please select a database.');
+    }
     jQuery(window).resize();
   });
 };
@@ -350,4 +351,4 @@ var execute = function(oldPos) {
 window["tab"] = tab;
 
 jQuery(document).ready(onLoad);
-})();
+};
