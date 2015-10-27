@@ -3,63 +3,6 @@
  */
 function wrapper(options){
 "use strict";
-  function QueryableWorker (sURL, fDefListener, fOnError) {
-    var oInstance = this, oWorker = new Worker(sURL), oListeners = {};
-    this.defaultListener = fDefListener || function () {};
-    oWorker.onmessage = function (oEvent) {
-      if (oEvent.data instanceof Object && oEvent.data.hasOwnProperty("vo42t30") && oEvent.data.hasOwnProperty("rnb93qh")) {
-        oListeners[oEvent.data.vo42t30].apply(oInstance, oEvent.data.rnb93qh);
-      } else {
-        this.defaultListener.call(oInstance, oEvent.data);
-      }
-    };
-    if (fOnError) { oWorker.onerror = fOnError; }
-    this.sendQuery = function () {
-      if (arguments.length < 1) { throw new TypeError("QueryableWorker.sendQuery - not enough arguments"); return; }
-      oWorker.postMessage({ "bk4e1h0": arguments[0], "ktp3fm1": Array.prototype.slice.call(arguments, 1) });
-    };
-    this.postMessage = function (vMsg) {
-      Worker.prototype.postMessage.call(oWorker, vMsg);
-    };
-    this.terminate = function () {
-      Worker.prototype.terminate.call(oWorker);
-    };
-    this.addListener = function (sName, fListener) {
-      oListeners[sName] = fListener;
-    };
-    this.removeListener = function (sName) {
-      delete oListeners[sName];
-    };
-  };
- 
-  var getWorkerTask = (function(fin){var slist = [];
-  var runList = function (remaining,list) {
-    if (remaining.length == 0) { fin(new QueryableWorker((window.webkitURL ? webkitURL : URL).createObjectURL(new Blob(list)) )); return; } // , yourDefaultMessageListenerHere (optional), yourErrorListenerHere (optional)
-    var oScript = remaining[0];
-    if ($(oScript).attr("src") !== undefined) {
-      jQuery.ajax( {
-        url: $(oScript).attr("src"),
-        success: function(data){
-          list.push(data);
-          runList(remaining.slice(1),list);
-        },
-        dataType:"text"
-      });
-    } else {
-      list.push(oScript.textContent);
-      runList(remaining.slice(1),list);
-    }
-  };
-  runList(Array.prototype.slice.call(document.querySelectorAll("script[type=\"text\/js-worker\"]")),slist);
-  });
-
-
-
-
-
-
-
-
 
 var tab = function(id,container) {
   if (id === "t1")
@@ -100,7 +43,6 @@ var trimLines = function(str) {
 var htmlEscape = function(v) {
     return v.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 };
-var datalogContent, luaContent, queryContent;
 
 var assert = function(thing) { if (thing !== true) throw new Error("Assertion failed");};
 
@@ -125,7 +67,6 @@ $.map(dataDirIndex.databases, function(v,k) {
   }
 });
 
-var editor, luaEditor, queryEditor;
 //window.geteditor = function() { return editor; };
 
 var contentChanged = false;
@@ -150,12 +91,11 @@ var switc = function(v) {
     contentChanged = false;
 }
 
-var task;
-
 var onLoad = function() {
-    CodeMirror.commands.autocomplete = function(cm) {
-        CodeMirror.simpleHint(cm, CodeMirror.datalogHint);
-    }
+    // TODO FIXME XXX re-add autocomplete
+    // CodeMirror.commands.autocomplete = function(cm) {
+    //     CodeMirror.simpleHint(cm, CodeMirror.datalogHint);
+    // }
     var lineNum = true, lineWrap = true;
     var editormap = function() { return {"datalog": editor, "lua":luaEditor, "query": queryEditor}; };
     editor = CodeMirror.fromTextArea(document.getElementById("datalog"), {
@@ -180,8 +120,6 @@ var onLoad = function() {
     });
 
 
-  getWorkerTask(function(mytask) {
-    task = mytask;
     $(".body").scroll(function(){
       $('.qtip').each(function(){
         $(this).qtip('hide')
@@ -194,7 +132,7 @@ var onLoad = function() {
       [editor,luaEditor,queryEditor].map(function(v){v.setOption("theme", theme);});
       document.getElementsByTagName("body")[0].id=theme;
       var dir = {};
-      ["ambiance", "blackboard", "cobalt", "erlang-dark", "lesser-dark", "monokai", "night", "rubyblue", "vibrant-ink", "xq-dark"].map(function(v){dir[v]="dark";}); 
+      ["ambiance", "blackboard", "cobalt", "erlang-dark", "lesser-dark", "monokai", "night", "rubyblue", "vibrant-ink", "xq-dark"].map(function(v){dir[v]="dark";});
       ["eclipse", "elegant", "neat"].map(function(v){dir[v]="light";});
       document.getElementsByTagName("body")[0].className=dir[theme];
     };
@@ -222,26 +160,39 @@ var onLoad = function() {
     });
 
     luaEditor.setValue(get("default.lua"));
-    document.getElementById("submitbutton").disabled = false;
     input.onchange();
-    if (dataDirIndex.initialDatabase) {
-      var db = data[dataDirIndex.initialDatabase];
-      if (db) {
-        if (db.clauses) {
-          switc(dataDirIndex.initialDatabase);
+
+    var timer = null;
+
+    Module["arguments"] = ['/lib.lua', '/datalog.dl', '/queries.dl'];
+    Module["print"] = function(v) {
+        distributeOutput(v);
+        if (timer != null) {
+          clearTimeout(timer);
+          timer = null;
+        }
+    };
+    write();
+
+    jQuery.getScript("main.js", function(script, textStatus, jqXHR) {
+      if (dataDirIndex.initialDatabase) {
+        var db = data[dataDirIndex.initialDatabase];
+        if (db) {
+          if (db.clauses) {
+            switc(dataDirIndex.initialDatabase);
+          } else {
+            jQuery('#output').html("Database '" + dataDirIndex.initialDatabase + "' does not contain any clauses.");
+          }
         } else {
-          jQuery('#output').html("Database '" + dataDirIndex.initialDatabase + "' does not contain any clauses.");
+          jQuery("#output")
+            .addClass("error")
+            .html("Database '" + dataDirIndex.initialDatabase + "' doesn't exist.<br><br>Please select an existing one.");
         }
       } else {
-        jQuery("#output")
-          .addClass("error")
-          .html("Database '" + dataDirIndex.initialDatabase + "' doesn't exist.<br><br>Please select an existing one.");
+          jQuery('#output').html('Please select a database.');
       }
-    } else {
-        jQuery('#output').html('Please select a database.');
-    }
-    jQuery(window).resize();
-  });
+      jQuery(window).resize();
+    });
 };
 
 var tableOutput;
@@ -276,7 +227,7 @@ function tableOutputHandler() {
 }
 
 var distributeOutput = function(v) {
-    //console.log(v);
+    console.log(v);
     var pat1 = "% QUERY ";
     var pat2 = "% TSV ";
     if (v.substr(0,pat1.length) === pat1) {
@@ -296,55 +247,28 @@ var distributeOutput = function(v) {
 var qtipcount = 0;
 
 var execute = function(oldPos) {
-    if (document.getElementById("submitbutton").disabled) throw new Error("disabled!");
-    document.getElementById("submitbutton").disabled = true;
-
     $("body").removeClass("twocolumnlayout");
 
-    try {
-      datalogContent = editor.getValue();
-    } catch (err) {
-      datalogContent = document.getElementById("datalog").value;
-    }
-    try {
-      luaContent = luaEditor.getValue();
-    } catch (err) {
-      luaContent = document.getElementById("lua").value;
-    }
-    try {
-      queryContent = queryEditor.getValue();
-    } catch (err) {
-      queryContent = document.getElementById("queries").value;
-    }
-
-    var timer = null;
-
-    task.addListener("print",function(v) {
-        distributeOutput(v);
-        if (timer != null) {
-          clearTimeout(timer);
-          timer = null;
-        }
-    });
-    var fileToBox = {'/lib\\.lua': luaEditor, '/datalog\\.dl': editor, '/queries\\.dl': queryEditor};
     document.getElementById("output").innerHTML = "";
     tableOutput = new tableOutputHandler();
-    task.addListener("runFinished",function(rc){
-    $("#tableoutput table:last").tablesorter(); //.stupidtable();
-    jQuery("#output")[(rc === 0) ? "removeClass" : "addClass"]("error");
-    tab("t1","#outputtabcontainer");
-    if (rc !== 0) {
-      // find error line and highlight
-      Object.keys(fileToBox).map(function(v) {
-        var re = new RegExp(v + ":(\\d+)");
-        var arr = document.getElementById("output").innerHTML.match(re); // ["/datalog.dl:12", "12"] 
-        if (arr === null) return; //throw new Error("Could not find error line number");
-        jump(Number(arr[1])-1,fileToBox[v]);
-      });
-    }
-    document.getElementById("submitbutton").disabled = false;
-    });
-    task.sendQuery('runDatalog',datalogContent,luaContent,queryContent);
+    // TODO FIXME XXX re-add error highlighting
+    // var fileToBox = {'/lib\\.lua': luaEditor, '/datalog\\.dl': editor, '/queries\\.dl': queryEditor};
+    // task.addListener("runFinished",function(rc){
+    // $("#tableoutput table:last").tablesorter(); //.stupidtable();
+    // jQuery("#output")[(rc === 0) ? "removeClass" : "addClass"]("error");
+    // tab("t1","#outputtabcontainer");
+    // if (rc !== 0) {
+    //   // find error line and highlight
+    //   Object.keys(fileToBox).map(function(v) {
+    //     var re = new RegExp(v + ":(\\d+)");
+    //     var arr = document.getElementById("output").innerHTML.match(re); // ["/datalog.dl:12", "12"]
+    //     if (arr === null) return; //throw new Error("Could not find error line number");
+    //     jump(Number(arr[1])-1,fileToBox[v]);
+    //   });
+    // }
+    // });
+    write();
+    Module.ccall("schedule_run");
     return false;
 };
 
@@ -352,3 +276,40 @@ window["tab"] = tab;
 
 jQuery(document).ready(onLoad);
 };
+
+function datalogContent() {
+    try {
+      return editor.getValue();
+    } catch (err) {
+      return document.getElementById("datalog").value;
+    }
+}
+
+function luaContent() {
+    try {
+      return luaEditor.getValue();
+    } catch (err) {
+      return document.getElementById("lua").value;
+    }
+}
+
+function queryContent() {
+    try {
+      return queryEditor.getValue();
+    } catch (err) {
+      return document.getElementById("queries").value;
+    }
+}
+
+var editor, luaEditor, queryEditor;
+
+var write = function() {
+    FS.writeFile('/datalog.dl', datalogContent());
+    FS.writeFile('/queries.dl', queryContent());
+    FS.writeFile('/lib.lua', luaContent());
+};
+
+var wrapperPreInit = function(FS) {
+    window.FS = FS;
+};
+var Module = {};

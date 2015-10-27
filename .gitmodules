@@ -1,0 +1,6 @@
+[submodule "CodeMirror"]
+	path = CodeMirror
+	url = https://github.com/codemirror/CodeMirror
+[submodule "datalog"]
+	path = datalog
+	url = git://git.code.sf.net/p/datalog/code

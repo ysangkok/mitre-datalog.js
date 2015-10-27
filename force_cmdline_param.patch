@@ -1,21 +1,23 @@
-21a22,25
+21a22,27
 > #undef HAVE_LIBREADLINE
 > #undef HAVE_READLINE_READLINE_H
 > #undef HAVE_READLINE_HISTORY_H
 > 
-38a43
+> #include <emscripten/emscripten.h>
+> #include <assert.h>
+38a45
 > FILE* query_file = 0;
-117d121
+117d123
 <   dl_free(a);
-131c135
+131c137
 <     printf("\n");		/* Print zero arity predicate. */
 ---
->     printf("% TSV \n");		/* Print zero arity predicate. */
-133a138
->       printf("% TSV ");
-144d148
+>     printf("%% TSV \n");		/* Print zero arity predicate. */
+133a140
+>       printf("%% TSV ");
+144d150
 <   dl_free(a);
-155,158c159,162
+155,158c161,164
 <   if (print_as_tsv)
 <     return print_answers_as_tab_separated_values(a);
 <   else
@@ -25,7 +27,7 @@
 >            (print_answers_as_datalog(a) << 16);
 >     dl_free(a);
 >     return rc;
-252,254c256,258
+252,254c258,260
 <   fputs(prompt, stdout);	/* Show prompt */
 <   fflush(stdout);		/* then get a line */
 <   buf = fgets(lb->buffer, LINE_SIZE, stdin);
@@ -33,42 +35,145 @@
 >   //fputs(prompt, stdout);	/* Show prompt */
 >   //fflush(stdout);		/* then get a line */
 >   buf = fgets(lb->buffer, LINE_SIZE, query_file);
-268c272,275
+268c274,277
 <   else if (!nofiles && buf[0] == '=') {	/* File loading requested. */
 ---
->   if (buf != 0) { printf("% QUERY %s", buf); // incl newline
+>   if (buf != 0) { printf("%% QUERY %s", buf); // incl newline
 >     if (buf[strlen(buf)-1] != '\n') puts("");
 >   }
 >   if (!nofiles && buf[0] == '=') {	/* File loading requested. */
-320,321c327,328
+320,321c329,330
 <   if (package != NULL)		/* Show welcome message. */
 <     printf("%s %s\n\n", package, version);
 ---
 > //  if (package != NULL)		/* Show welcome message. */
 > //    printf("%s %s\n\n", package, version);
-355a363,366
->   if (argc != 6 && argc != 4) { fprintf(stderr, "Need 5 or 3 arguments."); return 1; }
->   int interact = (argc==6 ? 1 : 0);
->   int nointeractbias = 0;
->   if (!interact) nointeractbias = -1;
-359d369
-<   int interact = 0;
-368a379
-> /*
-399c410
-<   case 0:			/* Use stdin */
+353,354c362,373
+< int
+< main(int argc, char **argv)
 ---
->   case 0:			// Use stdin
-403a415,416
-> */
->     input = argv[4+nointeractbias];
-412a426
-> /*
-423a438
-> */
-430a446,450
->   lua = argv[3+nointeractbias];
->   if (interact) {
->     query_file = fopen(argv[5+nointeractbias],"r");
->     if (!query_file) { fprintf(stderr, "Can't open query file (argument 5)\n"); return 1; }
+> void write_file(char* path, char* from, unsigned int len) {
+>   FILE* fp = fopen(path, "w");
+>   if(!fp) fprintf(stderr, "could not open");
+>   while (len--) {
+>     //putchar(*from);
+>     fwrite(from++, 1, 1, fp);
 >   }
+>   fclose(fp);
+> }
+> 
+> void
+> johnmandog(char* data, int size)
+356,357c375,380
+<   extern char *optarg;
+<   extern int optind;
+---
+>   freopen( "file.txt", "w", stdout );
+> 
+>   unsigned int s1 = *((unsigned int*) (data+0));
+>   unsigned int s2 = *((unsigned int*) (data+4));
+>   unsigned int s3 = *((unsigned int*) (data+8));
+>   //printf("%d %d %d\n", s1, s2, s3);
+359,362c382,390
+<   int interact = 0;
+<   char *input = NULL;
+<   char *output = NULL;
+<   char *lua = NULL;
+---
+>   char* lua = "/lib.lua";
+>   char* input = "/datalog.dl";
+>   char* q_f = "/queries.dl";
+> 
+>   write_file(lua, data+12, s1);
+>   write_file(input, data+12+s1, s2);
+>   write_file(q_f, data+12+s1+s2, s3);
+> 
+>   query_file = fopen(q_f,"r");
+369,404d396
+<   for (;;) {
+<     int c = getopt(argc, argv, "o:il:tvh");
+<     if (c == -1)
+<       break;
+<     switch (c) {
+<     case 'o':
+<       output = optarg;
+<       break;
+<     case 'i':
+<       interact = 1;
+<       break;
+<     case 'l':
+<       lua = optarg;
+<       break;
+<     case 't':
+<       print_as_tsv = 1;
+<       break;
+<     case 'v':
+<       print_version(argv[0]);
+<       return 0;
+<     case 'h':
+<       usage(argv[0]);
+<       return 0;
+<     default:
+<       usage(argv[0]);
+<       return 1;
+<     }
+<   }
+< 
+<   switch (argc - optind) {
+<   case 0:			/* Use stdin */
+<     interact = 1;
+<     break;
+<   case 1:
+<     input = argv[optind];
+<     if (strcmp(STDIN_NAME, input)) {
+408c400,402
+< 	return 1;
+---
+>         rc = 9003;
+>         emscripten_worker_respond(&rc, 4);
+> 	return;
+410,423d403
+<     }
+<     else
+<       in = stdin;
+<     break;
+<   default:
+<     fprintf(stderr, "Bad arg count\n");
+<     usage(argv[0]);
+<     return 1;
+<   }
+< 
+<   if (output && !freopen(output, "w", stdout)) {
+<     perror(output);
+<     return 1;
+<   }
+428c408,410
+<     return 1;
+---
+>     rc = 9002;
+>     emscripten_worker_respond(&rc, 4);
+>     return;
+431d412
+<   if (lua) {			/* Load Lua extensions if present  */
+439c420,421
+<       return 1;
+---
+>       emscripten_worker_respond(&rc, 4);
+>       return;
+441d422
+<   }
+446c427,428
+<   if (interact && !rc)
+---
+>   if (rc) fprintf(stderr, "err loading\n");
+>   if (!rc)
+449c431,437
+<   return rc;
+---
+> 
+>   int c;
+>   FILE* fp = fopen("file.txt", "r");
+>   while ((c = getc(fp)) != EOF) emscripten_worker_respond_provisionally(&c, 1);
+>   fclose(fp);
+> 
+>   emscripten_worker_respond(&rc, 4);

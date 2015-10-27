@@ -1,0 +1,24 @@
+<!doctype html>
+<html>
+<body>
+<script>
+clauses = "% Equality test\nancestor(A, B) :-\n  parent(A, B).\nancestor(A, B) :-\n  parent(A, C),\n  D = C,      % Unification required\n  ancestor(D, B).\nparent(john, douglas).\nparent(bob, john).\nparent(ebbon, bob).\n";
+queries = "ancestor(A, B)?\n";
+lua = "";
+
+var wrapperPreInit = function(FS) {
+    FS.writeFile('/datalog.dl', clauses);
+    FS.writeFile('/queries.dl', queries);
+    FS.writeFile('/lib.lua', lua);
+};
+
+var Module = {};
+Module["arguments"] = ['/lib.lua', '/datalog.dl', '/queries.dl'];
+Module["print"] = function(v) { console.log("print", v); };
+//Module["noInitialRun"] = true;
+//Module = CompiledModule(Module,wrapperPreInit);
+</script>
+<script src="main.js"></script>
+<script>
+//var rc = Module["run"]();
+</script>

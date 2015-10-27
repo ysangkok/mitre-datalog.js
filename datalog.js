@@ -1,1 +1,0 @@
-datalog-2.2/datalog.js

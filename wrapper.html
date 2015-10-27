@@ -3,43 +3,7 @@
 <head>
   <meta charset="utf-8">
   <title>Datalog.js</title>
-<script type="text/js-worker" src="datalog-2.2/datalog.js"></script>
-<script type="text/js-worker">
-var queryableFunctions = {
-  runDatalog: function(clauses, lua, queries) {
-      var wrapperPreInit = function(FS) {
-          FS.createDataFile('/', 'datalog.dl', clauses, true, false);
-          FS.createDataFile('/', 'queries.dl', queries, true, false);
-          FS.createDataFile('/', 'lib.lua', lua, true, false);
-      };
-
-      var Module = {};
-      Module["arguments"] = ['-i', '-l', '/lib.lua', '/datalog.dl', '/queries.dl'];
-      Module["print"] = function(v) { reply("print", v); };
-      Module["noInitialRun"] = true;
-      Module = CompiledModule(Module,wrapperPreInit);
-      var rc = Module["run"]();
-      reply("runFinished", rc);
-  }
-};
- 
-function defaultQuery (vMsg) {
-  // default PUBLIC function executed only when main page calls the queryableWorker.postMessage() method directly
-}
- 
-function reply (/* listener name, argument to pass 1, argument to pass 2, etc. etc */) {
-  if (arguments.length < 1) { throw new TypeError("reply - not enough arguments"); return; }
-  postMessage({ "vo42t30": arguments[0], "rnb93qh": Array.prototype.slice.call(arguments, 1) });
-}
- 
-self.onmessage = function (oEvent) {
-  if (oEvent.data instanceof Object && oEvent.data.hasOwnProperty("bk4e1h0") && oEvent.data.hasOwnProperty("ktp3fm1")) {
-    queryableFunctions[oEvent.data.bk4e1h0].apply(self, oEvent.data.ktp3fm1);
-  } else {
-    defaultQuery(oEvent.data);
-  }
-};
-</script>
+<script type="text/javascript" src="datalog/datalog.js"></script>
   <link type="text/css" rel="stylesheet" href="normalize.css">
   <script src="css_browser_selector_dev.js"></script>
 
@@ -52,25 +16,25 @@ self.onmessage = function (oEvent) {
 <!--  <script src="jquery.qtip.min.js"></script> 
   <link type="text/css" rel="stylesheet" href="jquery.qtip.css"> -->
 
-  <link type="text/css" rel="stylesheet" href="CodeMirror-2.33/lib/codemirror.css">
-  <script type="text/javascript" src="CodeMirror-2.33/lib/codemirror.js"></script>
+  <link type="text/css" rel="stylesheet" href="CodeMirror/lib/codemirror.css">
+  <script type="text/javascript" src="CodeMirror/lib/codemirror.js"></script>
   <script type="text/javascript" src="datalogCodeMirrorMode.js"></script>
-  <script type="text/javascript" src="CodeMirror-2.33/mode/lua/lua.js"></script>
-  <link rel="stylesheet" href="CodeMirror-2.33/theme/neat.css">
-  <link rel="stylesheet" href="CodeMirror-2.33/theme/elegant.css">
-  <link rel="stylesheet" href="CodeMirror-2.33/theme/erlang-dark.css">
-  <link rel="stylesheet" href="CodeMirror-2.33/theme/night.css">
-  <link rel="stylesheet" href="CodeMirror-2.33/theme/monokai.css">
-  <link rel="stylesheet" href="CodeMirror-2.33/theme/cobalt.css">
-  <link rel="stylesheet" href="CodeMirror-2.33/theme/eclipse.css">
-  <link rel="stylesheet" href="CodeMirror-2.33/theme/rubyblue.css">
-  <link rel="stylesheet" href="CodeMirror-2.33/theme/lesser-dark.css">
-  <link rel="stylesheet" href="CodeMirror-2.33/theme/xq-dark.css">
-  <link rel="stylesheet" href="CodeMirror-2.33/theme/ambiance.css">
-  <link rel="stylesheet" href="CodeMirror-2.33/theme/blackboard.css">
-  <link rel="stylesheet" href="CodeMirror-2.33/theme/vibrant-ink.css">
-  <script src="CodeMirror-2.33/lib/util/simple-hint.js"></script>
-  <link rel="stylesheet" href="CodeMirror-2.33/lib/util/simple-hint.css">
+  <script type="text/javascript" src="CodeMirror/mode/lua/lua.js"></script>
+  <link rel="stylesheet" href="CodeMirror/theme/neat.css">
+  <link rel="stylesheet" href="CodeMirror/theme/elegant.css">
+  <link rel="stylesheet" href="CodeMirror/theme/erlang-dark.css">
+  <link rel="stylesheet" href="CodeMirror/theme/night.css">
+  <link rel="stylesheet" href="CodeMirror/theme/monokai.css">
+  <link rel="stylesheet" href="CodeMirror/theme/cobalt.css">
+  <link rel="stylesheet" href="CodeMirror/theme/eclipse.css">
+  <link rel="stylesheet" href="CodeMirror/theme/rubyblue.css">
+  <link rel="stylesheet" href="CodeMirror/theme/lesser-dark.css">
+  <link rel="stylesheet" href="CodeMirror/theme/xq-dark.css">
+  <link rel="stylesheet" href="CodeMirror/theme/ambiance.css">
+  <link rel="stylesheet" href="CodeMirror/theme/blackboard.css">
+  <link rel="stylesheet" href="CodeMirror/theme/vibrant-ink.css">
+  <script src="CodeMirror/lib/util/simple-hint.js"></script>
+  <link rel="stylesheet" href="CodeMirror/lib/util/simple-hint.css">
   <script src="datalog-hint.js"></script>
 <!-- <script src="es6-shim/es6-shim.js"></script> -->
 <script>/*the only js is to continuously checking the value of the dropdown. for posterity*/
@@ -267,7 +231,7 @@ window["editorOnChange"] = function(editor, change, nameToBox) {
   </div> 
   <div class="footer row">
     <div id="footerpane" class="pane">
-      <input id="submitbutton" class="button" type="submit" disabled value="Execute">
+      <input id="submitbutton" class="button" type="submit" value="Execute">
     </div>
   </div>
   </form>

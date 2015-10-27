@@ -1,1 +1,5 @@
-datalog-2.2/*
+datalog/*
+main.js
+datalog.js
+emsdk_portable*
+emsdk-portable*
